@@ -1,0 +1,26 @@
+name: bytes
+description: The core of the ODW SDK.
+version: 0.7.0
+author: Jim Philbin <jfphilbin@gmail.com>
+
+homepage: https://github.com/OpenDICOMweb/bytes
+
+environment:
+  sdk: '>=2.0.0 <3.0.0'
+
+dependencies:
+
+dev_dependencies:
+  benchmark_harness: any
+  coverage: any
+  grinder: ^0.8.0
+  test:  any
+  test_tools:
+    path: ../test_tools
+    version: ^0.7.5
+  core:
+    path: ../sdk/core
+    version: any
+  rng:
+    path: C:/odw/rng
+    version: ^0.8.0

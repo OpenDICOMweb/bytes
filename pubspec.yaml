@@ -16,11 +16,8 @@ dev_dependencies:
   grinder: ^0.8.0
   test:  any
   test_tools:
-    path: ../test_tools
+    path: ../../test_tools
     version: ^0.7.5
-  core:
-    path: ../sdk/core
-    version: any
   rng:
-    path: C:/odw/rng
+    path: C:/odw/sdk/rng
     version: ^0.8.0

@@ -29,3 +29,6 @@
         
 5. Test and record performance
 
+## V 0.9
+
+1. Remove all log.debug statements.

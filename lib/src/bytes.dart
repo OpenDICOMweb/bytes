@@ -12,7 +12,7 @@ import 'dart:typed_data';
 
 import 'package:bytes/src/bytes_get_mixin.dart';
 import 'package:bytes/src/bytes_set_mixin.dart';
-import 'package:bytes/src/charset/charset.dart';
+
 
 /// Bytes Package Overview
 ///
@@ -95,69 +95,14 @@ class Bytes extends ListBase<int>
     return Bytes.typedDataView(bList);
   }
 
-  /// Returns a [Bytes] containing the ASCII encoding of [s].
-  factory Bytes.ascii(String s) {
-    if (s == null) return null;
-    return s.isEmpty ? kEmptyBytes : Bytes.typedDataView(cvt.ascii.encode(s));
-  }
+  /// Returns [Bytes] containing a UTF8 encoding of [s];
+  factory Bytes.fromString(String s) {
 
-  /// Returns [Bytes] containing the UTF-8 encoding of [s];
-  factory Bytes.utf8(String s) {
     if (s == null) return null;
     if (s.isEmpty) return kEmptyBytes;
-    final Uint8List u8List = cvt.utf8.encode(s);
-    return Bytes.typedDataView(u8List);
+    final Uint8List list = cvt.utf8.encode(s);
+    return Bytes.typedDataView(list);
   }
-
-  /// Returns [Bytes] containing the Latin character set encoding of [s];
-  factory Bytes.latin(String s) {
-    if (s == null) return null;
-    if (s.isEmpty) return kEmptyBytes;
-    final u8List = cvt.latin1.encode(s);
-    return Bytes.typedDataView(u8List);
-  }
-
-  /// Returns [Bytes] containing the [charset] encoding of [s];
-  factory Bytes.fromString(String s, Ascii charset) {
-    charset ??= utf8;
-    if (s == null) return null;
-    if (s.isEmpty) return kEmptyBytes;
-    return Bytes.typedDataView(charset.encode(s));
-  }
-
-  /// Returns a [Bytes] containing ASCII code units.
-  ///
-  /// The [String]s in [vList] are [join]ed into a single string using
-  /// using [separator] (which defaults to '\') to separate them, and
-  /// then they are encoded as ASCII, and returned as [Bytes].
-  factory Bytes.asciiFromList(List<String> vList, [String separator = '\\']) =>
-      Bytes.ascii(_listToString(vList, separator));
-
-  /// Returns a [Bytes] containing UTF-8 code units.
-  ///
-  /// The [String]s in [vList] are [join]ed into a single string using
-  /// using [separator] (which defaults to '\') to separate them, and
-  /// then they are encoded as UTF-8 and returned as [Bytes].
-  factory Bytes.utf8FromList(List<String> vList, [String separator = '\\']) =>
-      Bytes.utf8(_listToString(vList, separator));
-
-  /// Returns a [Bytes] containing Latin (1 - 9) code units.
-  ///
-  /// The [String]s in [vList] are [join]ed into a single string using
-  /// using [separator] (which defaults to '\') to separate them, and
-  /// then they are encoded as UTF-8, and returned as [Bytes].
-  factory Bytes.latinFromList(List<String> vList, [String separator = '\\']) =>
-      Bytes.latin(_listToString(vList, separator));
-
-  /// Returns a [Bytes] containing [charset] code units.
-  /// [charset] defaults to UTF8.
-  ///
-  /// The [String]s in [vList] are [join]ed into a single string using
-  /// using [separator] (which defaults to '\') to separate them, and
-  /// then they are encoded as UTF-8, and returned as [Bytes].
-  factory Bytes.fromStringList(List<String> vList,
-          {Ascii charset, String separator = '\\'}) =>
-      Bytes.fromString(_listToString(vList, separator), charset ?? utf8);
 
   @override
   int operator [](int i) => buf[i];
@@ -309,12 +254,6 @@ Uint8List _bytesView(Uint8List list, int offset, int end) {
   return list.buffer.asUint8List(_offset, _length);
 }
 
-// TODO maxLength if for DICOM Value Field
-String _listToString(List<String> vList, String separator) {
-  if (vList == null) return null;
-  if (vList.isEmpty) return '';
-  return vList.length == 1 ? vList[0] : vList.join(separator);
-}
 
 /// If [minLength] is less than or equal to the current length of
 /// [buf] returns [buf]; otherwise, returns a new [ByteData] with a length

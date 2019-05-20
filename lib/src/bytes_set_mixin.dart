@@ -11,7 +11,8 @@ import 'dart:typed_data';
 
 import 'package:bytes/src/bytes.dart';
 import 'package:bytes/src/constants.dart';
-import 'package:bytes/src/charset/ascii.dart';
+
+const _kSpace = 0x20;
 
 /// [BytesSetMixin] is a class that provides a read-only byte array that
 /// supports both [Uint8List] and [ByteData] interfaces.
@@ -209,21 +210,21 @@ mixin BytesSetMixin {
   /// UTF-8 encodes the specified range of [s] and then writes the
   /// code units to _this_ starting at [start]. Returns the offset
   /// of the last byte + 1.
-  int setAscii(int start, String s, [int padChar = kSpace]) =>
+  int setAscii(int start, String s, [int padChar = _kSpace]) =>
       setUint8List(start, cvt.ascii.encode(s));
 
   /// Writes the ASCII [String]s in [sList] to _this_ starting at
   /// [start]. If [padChar] is not _null_ and the final offset is odd,
   /// then [padChar] is written after the other elements have been written.
   /// Returns the number of bytes written.
-  int setAsciiList(int start, List<String> sList, [int padChar = kSpace]) =>
+  int setAsciiList(int start, List<String> sList, [int padChar = _kSpace]) =>
       setAscii(start, sList.join('\\'), padChar);
 
   // TODO: unit test
   /// UTF-8 encodes the specified range of [s] and then writes the
   /// code units to _this_ starting at [start]. Returns the offset
   /// of the last byte + 1.
-  int setLatin(int start, String s, [int padChar = kSpace]) =>
+  int setLatin(int start, String s, [int padChar = _kSpace]) =>
       setUint8List(start, cvt.latin1.encode(s));
 
   /// Writes the LATIN [String]s in [sList] to _this_ starting at
@@ -231,14 +232,14 @@ mixin BytesSetMixin {
   /// then [padChar] is written after the other elements have been written.
   /// Returns the number of bytes written.
   /// _Note_: All latin character sets are encoded as single 8-bit bytes.
-  int setLatinList(int start, List<String> sList, [int padChar = kSpace]) =>
+  int setLatinList(int start, List<String> sList, [int padChar = _kSpace]) =>
       setAscii(start, sList.join('\\'), padChar);
 
   // TODO: unit test
   /// UTF-8 encodes the specified range of [s] and then writes the
   /// code units to _this_ starting at [start]. Returns the offset
   /// of the last byte + 1.
-  int setUtf8(int start, String s, [int padChar = kSpace]) =>
+  int setUtf8(int start, String s, [int padChar = _kSpace]) =>
       setUint8List(start, cvt.utf8.encode(s));
 
   /// Converts the [String]s in [sList] into a [Uint8List].

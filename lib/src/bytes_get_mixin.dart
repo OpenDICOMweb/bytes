@@ -10,7 +10,6 @@ import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
 import 'package:bytes/src/bytes.dart';
-import 'package:bytes/src/charset/charset.dart';
 
 /// [BytesGetMixin] is a class that provides a read-only byte array that
 /// supports both [Uint8List] and [ByteData] interfaces.
@@ -20,7 +19,6 @@ mixin BytesGetMixin {
   Endian get endian;
 
   // **** End of Interface
-
 
   // **** Public Getters
 
@@ -451,25 +449,25 @@ mixin BytesGetMixin {
   }
 
   /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
-  String getString(Charset charset,
+  String getString(
       {int offset = 0,
       int length,
       bool allowInvalid = true,
       bool removeNull = false}) {
     final v = _asUint8ListForString(offset, length ?? buf.length, removeNull);
-    return v.isEmpty ? '' : charset.decode(v, allowInvalid: true);
+    return v.isEmpty ? '' : cvt.utf8.decode(v, allowMalformed: true);
   }
 
   /// Returns a [List<String>]. This is done by first decoding
   /// the specified region as _UTF-8_, and then _split_ing the
   /// resulting [String] using the [separator].
-  List<String> getStringList(Charset charset,
+  List<String> getStringList(
       {int offset = 0,
       int length,
       bool allowInvalid = true,
       String separator = '\\'}) {
-    final s = getString(charset,
-        offset: offset, length: length, allowInvalid: allowInvalid);
+    final s =
+        getString(offset: offset, length: length, allowInvalid: allowInvalid);
     return (s.isEmpty) ? <String>[] : s.split(separator);
   }
 

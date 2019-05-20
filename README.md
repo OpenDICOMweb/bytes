@@ -1,6 +1,11 @@
 # Bytes
 
+
 The Bytes package 
+
+# Basics
+
+All _String_s when converted to Bytes are UTF8
 
 It defines DICOM objects such as:
 

@@ -15,7 +15,9 @@ import 'package:test/test.dart';
 
 void main() {
   final rng = RNG();
-  group('Bytes Float Tests', () {
+
+  group('Bytes Float32 Tests', () {
+
     test('Basic Float32 tests', () {
       final vList0 = rng.float32List(5, 10);
       // log.debug('vList0: $vList0');

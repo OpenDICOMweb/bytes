@@ -9,6 +9,7 @@ environment:
   sdk: '>=2.0.0 <3.0.0'
 
 dependencies:
+  charcode: any
 
 dev_dependencies:
   benchmark_harness: any
@@ -16,7 +17,7 @@ dev_dependencies:
   grinder: ^0.8.0
   test:  any
   test_tools:
-    path: ../../test_tools
+    path: C:/odw/test_tools
     version: ^0.7.5
   rng:
     path: C:/odw/sdk/rng

@@ -1,11 +1,20 @@
 # ToDo for Bytes Package
 
-1. Finish README.md
-2. Make existing  debug work
+## Done
+
+1. Make existing debug work
 1. Make existing test work
+
+## Current
+
+1. Remove Charset dependencies
+1. Remove Ascii dependencies
+1. Remove DICOM dependencies
 3. Remove all commented code
 4. Document all public methods,...
 5. Test and record performance
+1. Finish README.md
+
 
 ## V 0.8
 

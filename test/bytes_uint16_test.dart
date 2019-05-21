@@ -47,7 +47,7 @@ void main() {
       expect(vList3[0], equals(vList0[0]));
       expect(vList3[1], equals(vList0[1]));
 
-      final bytes4 = Bytes(bytes0.length)..setUint16List(0, vList0);
+      final bytes4 =Bytes.empty(bytes0.length)..setUint16List(0, vList0);
       final vList4 = bytes4.asUint16List();
       expect(vList4, equals(vList3));
       expect(vList4[0], equals(vList0[0]));

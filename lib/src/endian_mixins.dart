@@ -7,13 +7,12 @@
 //
 import 'dart:typed_data';
 
-mixin EndianMixins {
+mixin LittleEndianMixin {
   Uint8List get buf;
   ByteData get bd;
 
- // static const Endian endian = Endian.little;
-
-  String get endianness =>  'LE';
+  Endian get endian => Endian.little;
+  String get endianness => 'LE';
 
   // **** Public Getters
 
@@ -34,7 +33,6 @@ mixin EndianMixins {
     final z = bd.getInt32(i += 4, Endian.little);
     return Int32x4(w, x, y, z);
   }
-
 
   /// Returns an 8-bit unsigned integer values at
   ///     `index = [buf].offsetInBytes + [i]`
@@ -75,9 +73,8 @@ mixin BigEndianMixin {
   Uint8List get buf;
   ByteData get bd;
 
-  // static const Endian endian = Endian.big;
-
-  String get endianness =>  'LE';
+  Endian get endian => Endian.little;
+  String get endianness => 'LE';
 
   // **** Public Getters
 
@@ -98,7 +95,6 @@ mixin BigEndianMixin {
     final z = bd.getInt32(i += 4, Endian.big);
     return Int32x4(w, x, y, z);
   }
-
 
   /// Returns an 8-bit unsigned integer values at
   ///     `index = [buf].offsetInBytes + [i]`

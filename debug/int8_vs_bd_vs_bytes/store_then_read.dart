@@ -53,7 +53,7 @@ void main(List<String> args) {
     total1 += time1;
 
     // Bytes
-    final bytes = Bytes(length);
+    final bytes =Bytes.empty(length);
     start = timer.elapsedMicroseconds;
     for (var j = 0; j < repetitions; j++) {
       for (var k = 0; k < length; k++) {

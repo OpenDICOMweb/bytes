@@ -9,22 +9,43 @@
 import 'dart:typed_data';
 
 import 'package:bytes/src/bytes.dart';
+import 'package:bytes/src/bytes_endian.dart';
 
 /// A [Bytes] that can incrementally grow in size.
-class GrowableBytes extends Bytes {
-  /// Returns a new [Bytes] of [length].
-  GrowableBytes([int length, Endian endian = Endian.little])
-      : super(length, endian);
+abstract class GrowableBytes extends Bytes {
+  @override
+  Uint8List get buf;
 
-  /// Returns a new [Bytes] of [length].
-  GrowableBytes._(int length, Endian endian) : super(length, endian);
+  /// Creates a new [Bytes] containing [length] elements.
+  /// [length] defaults to [kDefaultLength] and [endian] defaults
+  /// to [Endian.little].
+  factory GrowableBytes(
+          [int length = Bytes.kDefaultLength, Endian endian = Endian.little]) =>
+      (endian == Endian.little)
+          ? BytesLittleEndian(length)
+          : BytesBigEndian(length);
 
-  /// Returns a copy of the specified region and endianness of [Bytes].
-  GrowableBytes.from(Bytes bytes, [int offset = 0, int length, Endian endian])
-      : super.from(bytes, offset, length, endian);
+  /// Returns a view of the specified region of _this_.
+  factory GrowableBytes.view(Bytes bytes,
+          [int offset = 0, int length, Endian endian = Endian.little]) =>
+      (endian == Endian.little)
+          ? BytesLittleEndian.view(bytes, offset, length)
+          : BytesBigEndian.view(bytes, offset, length);
 
-  /// Returns a view of [td].
-  GrowableBytes.typedDataView(TypedData td,
-      [int offset = 0, int lengthInBytes, Endian endian = Endian.little])
-      : super.typedDataView(td, offset, lengthInBytes, endian);
+  /// Creates a new [Bytes] from [bytes] containing the specified region
+  /// and [endian]ness. [endian] defaults to [Endian.little].
+  factory GrowableBytes.from(Bytes bytes,
+          [int offset = 0, int length, Endian endian = Endian.little]) =>
+      (endian == Endian.little)
+          ? BytesLittleEndian.from(bytes, offset, length)
+          : BytesBigEndian.from(bytes, offset, length);
+
+  /// Creates a new [Bytes] from a [TypedData] containing the specified
+  /// region (from offset of length) and [endian]ness.
+  /// [endian] defaults to [Endian.little].
+  factory GrowableBytes.typedDataView(TypedData td,
+          [int offset = 0, int length, Endian endian = Endian.little]) =>
+      (endian == Endian.little)
+          ? BytesLittleEndian.typedDataView(td, offset, length)
+          : BytesBigEndian.typedDataView(td, offset, length);
 }

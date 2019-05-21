@@ -32,7 +32,7 @@ void main() {
       expect(vList3, equals(vList2));
 //      final bytes4 = Int8.toBytes(vList0);
       //     final vList4 = bytes1.asInt8List();
-      final bytes4 = Bytes(bytes0.length)..setInt8List(0, vList0);
+      final bytes4 =Bytes.empty(bytes0.length)..setInt8List(0, vList0);
       final vList4 = bytes4.asInt8List();
       expect(vList4, equals(vList3));
     });

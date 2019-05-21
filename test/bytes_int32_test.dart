@@ -31,7 +31,7 @@ void main() {
       // log.debug('vList3: $vList3');
       expect(vList3, equals(vList0));
       expect(vList3, equals(vList2));
-      final bytes4 = Bytes(bytes0.length)
+      final bytes4 =Bytes.empty(bytes0.length)
         ..setInt32List(0, vList0);
       final vList4 = bytes4.asInt32List();
       expect(vList4, equals(vList3));

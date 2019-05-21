@@ -41,7 +41,7 @@ void main(List<String> args) {
 
     // Bytes
     start = timer.elapsedMicroseconds;
-    for (var j = 0; j < repetitions; j++) Bytes(length);
+    for (var j = 0; j < repetitions; j++) Bytes.empty(length);
     end = timer.elapsedMicroseconds;
     final time2 = end - start;
     total2 += time2;

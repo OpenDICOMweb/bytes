@@ -291,6 +291,14 @@ mixin BytesGetMixin {
 
   Uint8List getUint8List([int offset = 0, int length]) =>
       copyUint8List(buf, offset, length);
+// Urgent merge these
+  /// Returns a [Uint8List] that is a copy of the specified region of [list].
+  Uint8List copyUint8List(Uint8List list, int offset, int length) {
+    final len = length ?? list.length;
+    final copy = Uint8List(len);
+    for (var i = 0, j = offset; i < len; i++, j++) copy[i] = list[j];
+    return copy;
+  }
 
   /// Creates an [Uint16List] copy of the specified region of _this_.
   Uint16List getUint16List([int offset = 0, int length]) {

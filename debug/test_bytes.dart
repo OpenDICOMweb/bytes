@@ -13,7 +13,7 @@ void main(List<String> args) {
   const count = 12;
 
   for (var i = 0; i < count; i++) {
-    final a = Bytes(count);
+    final a =Bytes.empty(count);
 
     assert(a.length == count, isTrue);
     for (var i = 0; i < count; i++) {

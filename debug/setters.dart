@@ -6,10 +6,9 @@
 //  Primary Author: Jim Philbin <jfphilbin@gmail.edu>
 //  See the AUTHORS file for other contributors.
 //
-
 import 'dart:typed_data';
 
-import 'package:core/src/utils/bytes/bytes.dart';
+import 'package:bytes/bytes.dart';
 
 void main(List<String> args) {
 
@@ -28,7 +27,7 @@ void main(List<String> args) {
     assert(fl32List0[i] == fl32List1[i]);
 
   // Unaligned
-  final fl32b =  Bytes(20)
+  final fl32b = Bytes.empty(20)
   ..setFloat32(2, floats[0])
   ..setFloat32(6, floats[1])
   ..setFloat32(10, floats[2])
@@ -47,7 +46,7 @@ void main(List<String> args) {
 /*
   final float64 =  Float64List.fromList(floats);
   final fl64List0 =  Bytes.fromTypedData(float32);
-  final fl64a =  Bytes(fl64List0.lengthInBytes);
+  final fl64a = Bytes.empty(fl64List0.lengthInBytes);
   final fl64List1 = fl64a.asFloat64List();
 
 */

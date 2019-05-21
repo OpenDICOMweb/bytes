@@ -54,7 +54,7 @@ void main(List<String> args) {
     // Bytes[]
     start = timer.elapsedMicroseconds;
     for (var j = 0; j < repetitions; j++) {
-      final bytes = Bytes(length);
+      final bytes =Bytes.empty(length);
       for (var k = 0; k < length; k++) {
         bytes[k] = 1;
         v = bytes[k];

@@ -7,6 +7,10 @@
 
 // ignore_for_file: public_member_api_docs
 
+const int k1KB = 1024;
+const int k1MB = k1KB * 1024;
+const int k1GB = k1MB * 1024;
+
 const int kMinLength = 16;
 
 const int kInt8Size = 1;
@@ -44,4 +48,4 @@ const int kUint64MaxValue = 0xFFFFFFFFFFFFFFFF;
 
 const int kDefaultLength = 4096;
 
-const int kDefaultLimit = 1024 * 1024 * 1024; // 1 GB
+const int kDefaultLimit = k1GB;

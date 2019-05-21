@@ -1,5 +1,5 @@
 name: bytes
-description: The core of the ODW SDK.
+description: A package that unifies Uint8List and ByteData.
 version: 0.7.0
 author: Jim Philbin <jfphilbin@gmail.com>
 
@@ -9,7 +9,6 @@ environment:
   sdk: '>=2.0.0 <3.0.0'
 
 dependencies:
-  charcode: any
 
 dev_dependencies:
   benchmark_harness: any

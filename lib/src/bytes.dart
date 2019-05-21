@@ -12,7 +12,15 @@ import 'dart:typed_data';
 
 import 'package:bytes/src/bytes_get_mixin.dart';
 import 'package:bytes/src/bytes_set_mixin.dart';
+import 'package:bytes/src/constants.dart';
 
+/// The length at which _ensureLength_ switches from doubling the
+/// underlying [Uint8List] _buf_ to incrementing by [largeChunkIncrement].
+int doublingLimit = 128 * k1MB;
+
+/// The incremental increase in the underlying [Uint8List] _buf_ length
+/// when growing _buf_, once its length is greater than the [doublingLimit].
+int largeChunkIncrement = 4 * k1MB;
 
 /// Bytes Package Overview
 ///
@@ -34,7 +42,8 @@ class Bytes extends ListBase<int>
   /// [length] defaults to [kDefaultLength] and [endian] defaults
   /// to [Endian.little].
   Bytes([int length = kDefaultLength, Endian endian = Endian.little])
-      : endian = endian ?? Endian.little,
+      : assert(length >= 0),
+        endian = endian ?? Endian.little,
         buf = Uint8List(length ?? 1024 * 1024); //1MB
 
   /// Returns a view of the specified region of _this_.
@@ -49,20 +58,6 @@ class Bytes extends ListBase<int>
       [int offset = 0, int length, Endian endian = Endian.little])
       : endian = endian ?? Endian.little,
         buf = copyUint8List(bytes.buf, offset, length ?? bytes.length);
-
-/*
-  /// Creates a new [Bytes] from [bd]. [endian] defaults to [Endian.little].
-  Bytes.fromByteData(ByteData bd, [Endian endian = Endian.little])
-      : endian = endian ?? Endian.little,
-        buf = bd.buffer.asUint8List(bd.offsetInBytes);
-
-  /// Creates a new [Bytes] that contains the specified view of [list].
-  /// [endian] defaults to [Endian.little].
-  Bytes.fromUint8List(Uint8List list,
-      [int offset = 0, int length, Endian endian = Endian.little])
-      : endian = endian ?? Endian.little,
-        buf = list.buffer.asUint8List(offset, length ?? list.length);
-*/
 
   /// Creates a new [Bytes] from a [TypedData] containing the specified
   /// region (from offset of length) and [endian]ness.
@@ -97,12 +92,18 @@ class Bytes extends ListBase<int>
 
   /// Returns [Bytes] containing a UTF8 encoding of [s];
   factory Bytes.fromString(String s) {
-
     if (s == null) return null;
     if (s.isEmpty) return kEmptyBytes;
     final Uint8List list = cvt.utf8.encode(s);
     return Bytes.typedDataView(list);
   }
+
+  /// Returns a [Bytes] containing UTF-8 encoding of the concatination of
+  /// the [String]s in [vList].
+  factory Bytes.fromStringList(List<String> vList, [String separator = '\\']) =>
+      (vList.isEmpty)
+          ? Bytes.kEmptyBytes
+          : Bytes.fromString(vList.join(separator));
 
   @override
   int operator [](int i) => buf[i];
@@ -164,20 +165,14 @@ class Bytes extends ListBase<int>
   /// The offset of _this_ in the underlying buffer.
   int get offset => buf.offsetInBytes;
 
-
   @override
   int get length => buf.length;
 
   @override
   set length(int newLength) {
     if (newLength < buf.lengthInBytes) return;
-    grow(newLength);
+    ensureLength(newLength);
   }
-
-/* Urgent use in BytesReadOnly
-  set length(int length) =>
-      throw UnsupportedError('$runtimeType: length is not modifiable');
-*/
 
   /// Returns a [String] indicating the endianness of _this_.
   String get endianness => (endian == Endian.little) ? 'LE' : 'BE';
@@ -185,50 +180,33 @@ class Bytes extends ListBase<int>
   // **** Growable Methods
 
   /// Ensures that [buf] is at least [length] long, and grows
-  /// the buf if necessary, preserving existing data.
-  bool ensureLength(int length) => _ensureLength(buf, length);
+  /// the it if necessary, preserving existing data.
+  ///
+  ///     _Note_" [length] must be greater than 0.
+  ///
+  /// [buf] growth is controlled by two parameters: [doublingLimit] and
+  /// [largeChunkIncrement]. [buf] size is grown by doubling the size of the
+  /// existing [buf] until its length reaches [doublingLimit], after that
+  /// the [buf] is grown in increments of [doublingLimit].
+  bool ensureLength(int length) {
+    assert(length > 0);
+    var len = buf.lengthInBytes;
+    if (length <= len) return false;
 
-  /// Creates a new buffer of length at least [minLength] in size, or if
-  /// [minLength == null, at least double the length of the current buffer;
-  /// and then copies the contents of the current buffer into the new buffer.
-  /// Finally, the new buffer becomes the buffer for _this_.
-  bool grow([int minLength]) {
-    final old = buf;
-    buf = _grow(old, minLength ??= old.lengthInBytes * 2);
+    while (len < length)
+      len = (len < doublingLimit) ? len * 2 : len + largeChunkIncrement;
+
+    if (len >= kDefaultLimit) throw const OutOfMemoryError();
+    final newBD = Uint8List(len);
+    for (var i = 0; i < buf.lengthInBytes; i++) newBD[i] = buf[i];
+    buf = newBD;
     _bd = buf.buffer.asByteData();
-    return buf == old;
+    return true;
   }
 
   @override
-  String toString() => '$endianness $runtimeType: ${bufInfo(buf)}';
-
-  /// If _this_ has a length greater than the value, then the
-  /// number of bytes displayed by [bufInfo] equal this value.
-  int truncateBytesLength = 12;
-
-  /// If _true_ the values in _this_ will be included in [bufInfo].
-  bool showByteValues = true;
-
-  /// Returns a [String] with useful information about _this_.
-  String bufInfo(Uint8List buf) {
-    final start = buf.offsetInBytes;
-    final length = buf.lengthInBytes;
-    final _length =
-        (length > truncateBytesLength) ? truncateBytesLength : length;
-    final end = start + length;
-    final sb = StringBuffer('$start-$end:$length');
-    // TODO: fix for truncated values print [x, y, z, ...]
-    if (showByteValues) sb.writeln('${buf.buffer.asUint8List(start, _length)}');
-    return '$sb';
-  }
-
-  /// Ensures that [list] is at least [minLength] long, and grows
-  /// the buf if necessary, preserving existing data.
-  static bool _ensureLength(Uint8List list, int minLength) =>
-      (minLength > list.lengthInBytes) ? _reallyGrow(list, minLength) : false;
-
-  /// 1 gigabyte.
-  static const int k1GB = 1024 * 1024 * 1024;
+  String toString() =>
+      '$endianness $runtimeType: $offset-${offset + length}:$length';
 
   /// The maximum length of _this_.
   static const int kMaximumLength = k1GB;
@@ -240,7 +218,7 @@ class Bytes extends ListBase<int>
   static const int kDefaultLength = 1024;
 
   /// The default limit for growing _this_.
-  static const int kDefaultLimit = 1024 * 1024 * 1024; // 1 GB
+  static const int kDefaultLimit = k1GB;
 
   /// The canonical empty (zero length) [Bytes] object.
   static final Bytes kEmptyBytes = Bytes(0);
@@ -252,27 +230,6 @@ Uint8List _bytesView(Uint8List list, int offset, int end) {
   final _offset = list.offsetInBytes + offset;
   final _length = (end ?? list.lengthInBytes) - _offset;
   return list.buffer.asUint8List(_offset, _length);
-}
-
-
-/// If [minLength] is less than or equal to the current length of
-/// [buf] returns [buf]; otherwise, returns a new [ByteData] with a length
-/// of at least [minLength].
-Uint8List _grow(Uint8List buf, int minLength) {
-  final oldLength = buf.lengthInBytes;
-  return (minLength <= oldLength) ? buf : _reallyGrow(buf, minLength);
-}
-
-/// Returns a new [ByteData] with length at least [minLength].
-Uint8List _reallyGrow(Uint8List buf, int minLength) {
-  var newLength = minLength;
-  do {
-    newLength *= 2;
-    if (newLength >= Bytes.kDefaultLimit) return null;
-  } while (newLength < minLength);
-  final newBD = Uint8List(newLength);
-  for (var i = 0; i < buf.lengthInBytes; i++) newBD[i] = buf[i];
-  return newBD;
 }
 
 /// Returns a [Uint8List] that is a copy of the specified region of [list].

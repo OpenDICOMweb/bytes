@@ -352,109 +352,13 @@ mixin BytesGetMixin {
     final index = _absIndex(offset);
     if (index < 0 || length > buf.lengthInBytes)
       throw ArgumentError('Invalid Offset: $offset');
-
-// Urgent Jim: remove when all test working
-//    final len = removePadding ? _maybeRemovePadding(length) : length;
     return buf.buffer.asUint8List(index, length);
   }
 
-/* Urgent move to DicomBytes
-  int _maybeRemovePadding(int vfLength) {
-    if (vfLength == 0) return vfLength;
-    final lastIndex = vfLength - 1;
-    final c = buf[lastIndex];
-    return (c == kSpace || c == kNull) ? lastIndex : vfLength;
-  }
-*/
-
-  // TODO: rewrite in terms of getString
-  /// Returns a [String] containing a _ASCII_ decoding of the specified
-  /// region of _this_. Also allows the removal of a padding character.
-  String stringFromAscii(
-      {int offset = 0,
-      int length,
-      bool allowInvalid = true,
-      bool removeNull = false}) {
-    final v = _asUint8ListForString(offset, length ?? buf.length, removeNull);
-    return v.isEmpty ? '' : cvt.ascii.decode(v, allowInvalid: allowInvalid);
-  }
-
-  // TODO: rewrite in terms of getStringList
-  /// Returns a [List<String>]. This is done by first decoding
-  /// the specified region as _ASCII_, and then _split_ing the
-  /// resulting [String] using the [separator]. Also allows the
-  /// removal of a padding character.
-  List<String> stringListFromAscii(
-      {int offset = 0,
-      int length,
-      bool allowInvalid = true,
-      String separator = '\\',
-      bool removeNull = false}) {
-    final s = stringFromAscii(
-        offset: offset,
-        length: length,
-        allowInvalid: allowInvalid,
-        removeNull: removeNull);
-    return (s.isEmpty) ? <String>[] : s.split(separator);
-  }
-
-  // TODO: rewrite in terms of getString
-  /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
-  /// Also, allows the removal of padding characters.
-  String stringFromUtf8(
-      {int offset = 0,
-      int length,
-      bool allowInvalid = true,
-      bool removeNull = false}) {
-    final v = _asUint8ListForString(offset, length ?? buf.length, removeNull);
-    return v.isEmpty ? '' : cvt.utf8.decode(v, allowMalformed: allowInvalid);
-  }
-
-  /// Returns a [List<String>]. This is done by first decoding
-  /// the specified region as _UTF-8_, and then _split_ing the
-  /// resulting [String] using the [separator].
-  // TODO: rewrite in terms of getStringList
-  List<String> stringListFromUtf8(
-      {int offset = 0,
-      int length,
-      bool allowInvalid = true,
-      String separator = '\\'}) {
-    final s = stringFromUtf8(
-        offset: offset, length: length, allowInvalid: allowInvalid);
-    return (s.isEmpty) ? <String>[] : s.split(separator);
-  }
-
-  // TODO: rewrite in terms of getString
-  String stringFromLatin(
-      {int offset = 0,
-      int length,
-      bool allowInvalid = true,
-      bool removeNull = false}) {
-    final v = _asUint8ListForString(offset, length ?? buf.length, removeNull);
-    return v.isEmpty ? '' : cvt.latin1.decode(v, allowInvalid: allowInvalid);
-  }
-
-  /// Returns a [List<String>]. This is done by first decoding
-  /// the specified region as _UTF-8_, and then _split_ing the
-  /// resulting [String] using the [separator].
-  // TODO: rewrite in terms of getStringList
-  List<String> stringListFromLatin(
-      {int offset = 0,
-      int length,
-      bool allowInvalid = true,
-      String separator = '\\'}) {
-    final s = stringFromLatin(
-        offset: offset, length: length, allowInvalid: allowInvalid);
-    return (s.isEmpty) ? <String>[] : s.split(separator);
-  }
 
   /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
-  String getString(
-      {int offset = 0,
-      int length,
-      bool allowInvalid = true,
-      bool removeNull = false}) {
-    final v = _asUint8ListForString(offset, length ?? buf.length, removeNull);
+  String getString({int offset = 0, int length, bool allowInvalid = true}) {
+    final v = _asUint8ListForString(offset, length ?? buf.length);
     return v.isEmpty ? '' : cvt.utf8.decode(v, allowMalformed: true);
   }
 

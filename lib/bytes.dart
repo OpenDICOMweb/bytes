@@ -7,5 +7,6 @@
 export 'package:bytes/src/bytes.dart';
 export 'package:bytes/src/bytes_get_mixin.dart';
 export 'package:bytes/src/bytes_set_mixin.dart';
+export 'package:bytes/src/constants.dart';
 export 'package:bytes/src/endian_mixins.dart';
 export 'package:bytes/src/growable_bytes.dart';

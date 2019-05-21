@@ -1,6 +1,6 @@
 name: bytes
 description: A package that unifies Uint8List and ByteData.
-version: 0.7.0
+version: 0.7.6
 author: Jim Philbin <jfphilbin@gmail.com>
 
 homepage: https://github.com/OpenDICOMweb/bytes

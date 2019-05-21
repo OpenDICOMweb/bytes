@@ -193,8 +193,12 @@ class Bytes extends ListBase<int>
     var len = buf.lengthInBytes;
     if (length <= len) return false;
 
-    while (len < length)
-      len = (len < doublingLimit) ? len * 2 : len + largeChunkIncrement;
+    if (len == 0) {
+      len = 1;
+    } else {
+      while (len < length)
+        len = (len < doublingLimit) ? len * 2 : len + largeChunkIncrement;
+    }
 
     if (len >= kDefaultLimit) throw const OutOfMemoryError();
     final newBD = Uint8List(len);

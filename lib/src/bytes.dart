@@ -121,9 +121,6 @@ abstract class Bytes extends ListBase<int>
   int operator [](int i) => buf[i];
 
   @override
-  void operator []=(int i, int v) => buf[i] = v;
-
-  @override
   bool operator ==(Object other) {
     if (other is Bytes) {
       if (length != other.length) return false;

@@ -15,51 +15,42 @@ import 'package:test/test.dart';
 void main() {
   final rng = RNG();
 
-  group('Bytes Float Tests', () {
+  group('Bytes Int8 Tests', () {
     test('Basic Int8 tests', () {
       final vList0 = rng.int8List(5, 10);
-      // log.debug('vList0: $vList0');
       final bytes0 = Bytes.typedDataView(vList0);
       final vList1 = bytes0.asInt8List();
       expect(vList1, equals(vList0));
-      // log.debug('vList1: $vList1');
+
       final vList2 = bytes0.getInt8List();
-      // log.debug('vList2: $vList2');
       expect(vList2, equals(vList1));
       final vList3 = bytes0.asInt8List();
-      // log.debug('vList3: $vList3');
       expect(vList3, equals(vList0));
       expect(vList3, equals(vList2));
-//      final bytes4 = Int8.toBytes(vList0);
-      //     final vList4 = bytes1.asInt8List();
-      final bytes4 =Bytes.empty(bytes0.length)..setInt8List(0, vList0);
+
+      final bytes4 = Bytes.empty(bytes0.length)..setInt8List(0, vList0);
       final vList4 = bytes4.asInt8List();
       expect(vList4, equals(vList3));
     });
 
     test('Int8 tests', () {
       final vList0 = rng.int8List(5, 10);
-      // log.debug('vList0: $vList0');
       expect(vList0 is Int8List, true);
 
       final bytes0 = Bytes.typedDataView(vList0);
-      // log.debug('bytes0: $bytes0');
       expect(bytes0.length, equals(vList0.length * vList0.elementSizeInBytes));
 
       final vList1 = bytes0.getInt8List();
-      // log.debug('vList1: $vList1');
       expect(vList1, equals(vList0));
 
       final bytes1 = Bytes.typedDataView(vList1);
       expect(bytes1.length, equals(vList1.length * vList1.elementSizeInBytes));
 
       final vList2 = bytes1.asInt8List();
-      // log.debug('vList2: $vList2');
       expect(vList2, equals(vList0));
       expect(vList2, equals(vList1));
 
       final bytes2 = Bytes.typedDataView(vList2);
-      // log.debug('bytes2: $bytes2');
       expect(bytes2.length, equals(vList2.length * vList2.elementSizeInBytes));
 
       for (var i = 0; i < vList0.length; i++) {
@@ -73,9 +64,7 @@ void main() {
       }
 
       final bytes3 = bytes2.sublist(0);
-      // log.debug('bytes3: $bytes3');
       final bytes4 = bytes2.asBytes();
-      // log.debug('bytes4: $bytes4');
 
       expect(bytes1 == bytes0, true);
       expect(bytes2 == bytes1, true);

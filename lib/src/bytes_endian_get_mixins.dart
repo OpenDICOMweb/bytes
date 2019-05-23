@@ -7,7 +7,7 @@
 //
 import 'dart:typed_data';
 
-mixin LittleEndianMixin {
+mixin LittleEndianGetMixin {
   Uint8List get buf;
   ByteData get bd;
 
@@ -69,7 +69,7 @@ mixin LittleEndianMixin {
       __checkRange(offset, sizeInBytes, buf);
 }
 
-mixin BigEndianMixin {
+mixin BigEndianGetMixin {
   Uint8List get buf;
   ByteData get bd;
 

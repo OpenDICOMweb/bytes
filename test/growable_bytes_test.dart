@@ -13,7 +13,7 @@ import 'package:test/test.dart';
 void main() {
   group('Growable Bytes Tests', () {
     test('Test ensureLength for doubling size', () {
-      final bytes = GrowableBytes(0);
+      final bytes = Bytes.empty();
       for (var i = 1; i < k1GB; i = i * 2) {
         bytes.ensureLength(i);
         if (i % 0x1000000 == 0)
@@ -22,7 +22,7 @@ void main() {
     });
 
     test('Test ensureLength above 1MB', () {
-      final bytes = GrowableBytes(k1MB);
+      final bytes = Bytes.empty(k1MB);
       for (var i = 1; i < 128 * k1MB; i++) {
         bytes.ensureLength(i);
         if (i % 0x1000000 == 0)

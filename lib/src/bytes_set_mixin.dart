@@ -21,6 +21,19 @@ mixin BytesSetMixin {
   ByteData get bd;
   Endian get endian;
 
+  void setInt16(int i, int v);
+  void setInt32(int i, int v);
+  void setInt64(int i, int v);
+  void setInt32x4(int i, Int32x4 v);
+
+  void setUint16(int i, int v);
+  void setUint32(int i, int v);
+  void setUint64(int i, int v);
+
+  void setFloat32(int i, double v);
+  void setFloat64(int i, double v);
+
+
   // **** End of Interface
 
   // ********************** Setters ********************************
@@ -28,6 +41,9 @@ mixin BytesSetMixin {
   // Internal setters take an absolute index [i] into the underlying
   // [ByteBuffer] ([buf].buffer).  The external interface of this package
   // uses [offset]s relative to the current [buf.offsetInBytes].
+
+  @override
+  void operator []=(int i, int v) => buf[i] = v;
 
   // **** Int8 set methods
 
@@ -42,7 +58,6 @@ mixin BytesSetMixin {
   }
 
 // Urgent Int List and Uint List methods should be the same
-  void setInt16(int i, int v) => bd.setInt16(i, v, endian);
 
   int setInt16List(int start, List<int> list, [int offset = 0, int length]) {
     length ??= list.length;
@@ -52,8 +67,6 @@ mixin BytesSetMixin {
     return length * 2;
   }
 
-  void setInt32(int i, int v) => bd.setInt32(i, v, endian);
-
   int setInt32List(int start, List<int> list, [int offset = 0, int length]) {
     length ??= list.length;
     _checkLength(offset, length, kInt32Size);
@@ -61,16 +74,6 @@ mixin BytesSetMixin {
       setInt32(j, list[i]);
     return length * 4;
   }
-
-  void setInt32x4(int offset, Int32x4 value) {
-    var i = offset;
-    setInt32(i, value.w);
-    setInt32(i += 4, value.x);
-    setInt32(i += 4, value.y);
-    setInt32(i += 4, value.z);
-  }
-
-  void setInt64(int i, int v) => bd.setInt64(i, v, endian);
 
   int setInt64List(int start, List<int> list, [int offset = 0, int length]) {
     length ??= list.length;
@@ -89,18 +92,12 @@ mixin BytesSetMixin {
     return length * 16;
   }
 
-  // **** Uint set methods
-
-  void setUint8(int i, int v) => buf[i] = v;
-
   int setUint8List(int start, List<int> list, [int offset = 0, int length]) {
     length ??= list.length;
     _checkRange(offset, length);
     for (var i = start, j = offset; i < length; i++, j++) buf[i] = list[j];
     return length;
   }
-
-  void setUint16(int i, int v) => bd.setUint16(i, v, endian);
 
   int setUint16List(int start, List<int> list, [int offset = 0, int length]) {
     length ??= list.length;
@@ -110,8 +107,6 @@ mixin BytesSetMixin {
     return length * 2;
   }
 
-  void setUint32(int i, int v) => bd.setUint32(i, v, endian);
-
   int setUint32List(int start, List<int> list, [int offset = 0, int length]) {
     length ??= list.length;
     _checkLength(offset, length, kUint32Size);
@@ -119,8 +114,6 @@ mixin BytesSetMixin {
       setUint32(j, list[i]);
     return length * 4;
   }
-
-  void setUint64(int i, int v) => bd.setUint64(i, v, endian);
 
   int setUint64List(int start, List<int> list, [int offset = 0, int length]) {
     length ??= list.length;
@@ -130,9 +123,7 @@ mixin BytesSetMixin {
     return length * 8;
   }
 
-  // Float32 set methods
-
-  void setFloat32(int i, double v) => bd.setFloat32(i, v, endian);
+  // Float32 set List methods
 
   int setFloat32List(int start, List<double> list,
       [int offset = 0, int length]) {
@@ -160,7 +151,11 @@ mixin BytesSetMixin {
     return length * 16;
   }
 
-  void setFloat64(int i, double v) => bd.setFloat64(i, v, endian);
+  void setFloat64x2(int index, Float64x2 v) {
+    var i = index;
+    setFloat64(i, v.x);
+    setFloat64(i += 4, v.y);
+  }
 
   int setFloat64List(int start, List<double> list,
       [int offset = 0, int length]) {
@@ -169,12 +164,6 @@ mixin BytesSetMixin {
     for (var i = offset, j = start; i < length; i++, j += 8)
       setFloat64(j, list[i]);
     return length * 8;
-  }
-
-  void setFloat64x2(int index, Float64x2 v) {
-    var i = index;
-    setFloat64(i, v.x);
-    setFloat64(i += 4, v.y);
   }
 
   int setFloat64x2List(int start, Float64x2List list,

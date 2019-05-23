@@ -7,10 +7,10 @@
 
 ## Current
 
+1. Add test for all get/set methods little-endian and big-endian
+1. Add test for String methods
 3. Remove all commented code
 4. Document all public methods,...
-1. Add test for all get methods
-1. Add tests for all set methods
 5. Test and record performance
 1. Finish README.md
 
@@ -36,6 +36,8 @@
         ii. little endian
         
 5. Test and record performance
+
+6. Add Read-Only version
 
 ## V 0.9
 

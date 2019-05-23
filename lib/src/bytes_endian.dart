@@ -11,7 +11,8 @@ import 'dart:typed_data';
 
 import 'package:bytes/src/bytes.dart';
 import 'package:bytes/src/constants.dart';
-import 'package:bytes/src/endian_mixins.dart';
+import 'package:bytes/src/bytes_endian_get_mixins.dart';
+import 'package:bytes/src/bytes_endian_set_mixins.dart';
 
 /// The length at which _ensureLength_ switches from doubling the
 /// underlying [Uint8List] _buf_ to incrementing by [largeChunkIncrement].
@@ -28,7 +29,8 @@ int largeChunkIncrement = 4 * k1MB;
 
 /// [BytesLittleEndian] is a class that implements a Little Endian
 /// byte array that supports both [Uint8List] and [ByteData] interfaces.
-class BytesLittleEndian extends Bytes with LittleEndianMixin {
+class BytesLittleEndian extends Bytes
+    with LittleEndianGetMixin, LittleEndianSetMixin {
   /// Creates a new [BytesLittleEndian] containing [length] elements.
   /// [length] defaults to [kDefaultLength] and [endian] defaults
   /// to [Endian.little].
@@ -94,7 +96,7 @@ class BytesLittleEndian extends Bytes with LittleEndianMixin {
 
 /// [BytesBigEndian] is a class that implements a Big Endian byte array
 /// that supports both [Uint8List] and [ByteData] interfaces.
-class BytesBigEndian extends Bytes with BigEndianMixin {
+class BytesBigEndian extends Bytes with BigEndianGetMixin, BigEndianSetMixin {
   /// Creates a new [BytesBigEndian] containing [length] elements.
   /// [length] defaults to [kDefaultLength] and [endian] defaults
   /// to [Endian.little].

@@ -46,23 +46,23 @@ abstract class Bytes extends ListBase<int>
   factory Bytes.empty(
           [int length = kDefaultLength, Endian endian = Endian.little]) =>
       (endian == Endian.little)
-          ? BytesLittleEndian(length)
-          : BytesBigEndian(length);
+          ? BytesLittleEndian.empty(length)
+          : BytesBigEndian.empty(length);
 
   /// Returns a view of the specified region of _this_.
-  factory Bytes.view(Bytes bytes,
-          [int offset = 0, int length, Endian endian = Endian.little]) =>
-      (endian == Endian.little)
+  factory Bytes.view(Bytes bytes, [int offset = 0, int length]) =>
+      (bytes.endian == Endian.little)
           ? BytesLittleEndian.view(bytes, offset, length)
           : BytesBigEndian.view(bytes, offset, length);
 
   /// Creates a new [Bytes] from [bytes] containing the specified region
-  /// and [endian]ness. [endian] defaults to [Endian.little].
-  factory Bytes.from(Bytes bytes,
-          [int offset = 0, int length, Endian endian = Endian.little]) =>
-      (endian == Endian.little)
-          ? BytesLittleEndian.from(bytes, offset, length)
-          : BytesBigEndian.from(bytes, offset, length);
+  /// and [endian]ness. [endian] defaults to [bytes].[endian].
+  factory Bytes.from(Bytes bytes, [int offset = 0, int length, Endian endian]) {
+    endian ??= bytes.endian;
+    return (endian == Endian.little)
+        ? BytesLittleEndian.from(bytes, offset, length)
+        : BytesBigEndian.from(bytes, offset, length);
+  }
 
   /// Creates a new [Bytes] from a [TypedData] containing the specified
   /// region (from offset of length) and [endian]ness.
@@ -188,10 +188,11 @@ abstract class Bytes extends ListBase<int>
 
   // **** Growable Methods
 
-  /// Ensures that [buf] is at least [length] long, and grows
-  /// the it if necessary, preserving existing data.
-  ///
-  ///     _Note_" [length] must be greater than 0.
+  ///  Returns _false_ if [length], which must be greater than 0, is
+  ///  less then or equal to the current [buf] length; otherwise,
+  ///  creates a new [Uint8List] with a _lengthInBytes_ greater than
+  ///  [length] and then copies [buf]s bytes into it. Finally,
+  ///  [buf] is set to the new [Uint8List].
   ///
   /// [buf] growth is controlled by two parameters: [doublingLimit] and
   /// [largeChunkIncrement]. [buf] size is grown by doubling the size of the
@@ -200,7 +201,7 @@ abstract class Bytes extends ListBase<int>
   bool ensureLength(int length) {
     assert(length > 0);
     var len = buf.lengthInBytes;
-    if (length <= len) return false;
+    if (len > length) return false;
 
     if (len == 0) {
       len = 1;
@@ -234,19 +235,8 @@ abstract class Bytes extends ListBase<int>
   static const int kDefaultLimit = k1GB;
 
   /// The canonical empty (zero length) [Bytes] object.
-  static final Bytes kEmptyBytes = BytesLittleEndian(0);
+  static final Bytes kEmptyBytes = BytesLittleEndian.empty(0);
 }
-
-/*
-
-//TODO: move this to the appropriate place
-/// Returns a [ByteData] that is a copy of the specified region of _this_.
-Uint8List _bytesView(Uint8List list, int offset, int end) {
-  final _offset = list.offsetInBytes + offset;
-  final _length = (end ?? list.lengthInBytes) - _offset;
-  return list.buffer.asUint8List(_offset, _length);
-}
-*/
 
 ///
 class AlignmentError extends Error {

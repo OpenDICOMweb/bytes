@@ -12,13 +12,6 @@ mixin LittleEndianGetMixin {
   ByteData get bd;
 
   Endian get endian => Endian.little;
-  String get endianness => 'LE';
-
-  // **** Public Getters
-
-  /// Returns an 8-bit integer values at `index = [buf].offsetInBytes + [i]`
-  /// in the underlying [Uint8List]. _Note_: [i] may be negative.
-  int getInt8(int i) => buf[i];
 
   int getInt16(int i) => bd.getInt16(i, Endian.little);
   int getInt32(int i) => bd.getInt32(i, Endian.little);
@@ -74,9 +67,6 @@ mixin BigEndianGetMixin {
   ByteData get bd;
 
   Endian get endian => Endian.little;
-  String get endianness => 'LE';
-
-  // **** Public Getters
 
   /// Returns an 8-bit integer values at `index = [buf].offsetInBytes + [i]`
   /// in the underlying [Uint8List]. _Note_: [i] may be negative.

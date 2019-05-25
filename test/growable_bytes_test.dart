@@ -11,7 +11,7 @@ import 'package:bytes/src/constants.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('Growable Bytes Tests', () {
+  group('Bytes Growing Tests', () {
     test('Test ensureLength for doubling size', () {
       final bytes = Bytes.empty();
       for (var i = 1; i < k1GB; i = i * 2) {

@@ -31,10 +31,13 @@ int largeChunkIncrement = 4 * k1MB;
 /// byte array that supports both [Uint8List] and [ByteData] interfaces.
 class BytesLittleEndian extends Bytes
     with LittleEndianGetMixin, LittleEndianSetMixin {
+  /// Creates a new [BytesLittleEndian] from [buf].
+  BytesLittleEndian(Uint8List buf) : super(buf);
+
   /// Creates a new [BytesLittleEndian] containing [length] elements.
   /// [length] defaults to [kDefaultLength] and [endian] defaults
   /// to [Endian.little].
-  BytesLittleEndian([int length = kDefaultLength])
+  BytesLittleEndian.empty([int length = kDefaultLength])
       : assert(length >= 0),
         super(Uint8List(length ?? k1MB));
 
@@ -97,10 +100,13 @@ class BytesLittleEndian extends Bytes
 /// [BytesBigEndian] is a class that implements a Big Endian byte array
 /// that supports both [Uint8List] and [ByteData] interfaces.
 class BytesBigEndian extends Bytes with BigEndianGetMixin, BigEndianSetMixin {
+  /// Creates a new [BytesBigEndian] from [buf].
+  BytesBigEndian(Uint8List buf) : super(buf);
+
   /// Creates a new [BytesBigEndian] containing [length] elements.
   /// [length] defaults to [kDefaultLength] and [endian] defaults
   /// to [Endian.little].
-  BytesBigEndian([int length = kDefaultLength])
+  BytesBigEndian.empty([int length = kDefaultLength])
       : assert(length >= 0),
         super(Uint8List(length ?? k1MB));
 
@@ -142,30 +148,4 @@ Uint8List copyUint8List(Uint8List list, int offset, int length) {
   final copy = Uint8List(len);
   for (var i = 0, j = offset; i < len; i++, j++) copy[i] = list[j];
   return copy;
-}
-
-///
-class AlignmentError extends Error {
-  /// The Uint8List with the error.
-  final Uint8List buf;
-
-  /// The offset in [buf]'
-  final int offsetInBytes;
-
-  /// The length in from [offsetInBytes] in [buf].
-  final int lengthInBytes;
-
-  /// The element size in bytes.
-  final int sizeInBytes;
-
-  /// Constructor
-  AlignmentError(
-      this.buf, this.offsetInBytes, this.lengthInBytes, this.sizeInBytes);
-}
-
-/// Throws an [Alignment Error].
-// ignore: prefer_void_to_null
-Null alignmentError(
-    Uint8List buf, int offsetInBytes, int lengthInBytes, int sizeInBytes) {
-  throw AlignmentError(buf, offsetInBytes, lengthInBytes, sizeInBytes);
 }

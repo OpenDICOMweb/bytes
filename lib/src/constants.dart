@@ -17,6 +17,7 @@ const int kInt8Size = 1;
 const int kInt16Size = 2;
 const int kInt32Size = 4;
 const int kInt64Size = 8;
+const int kInt32x4Size = 16;
 
 const int kUint8Size = 1;
 const int kUint16Size = 2;
@@ -24,7 +25,10 @@ const int kUint32Size = 4;
 const int kUint64Size = 8;
 
 const int kFloat32Size = 4;
+const int kFloat32x4Size = 16;
+
 const int kFloat64Size = 8;
+const int kFloat16x2Size = 16;
 
 const int kInt8MinValue = -0x7F - 1;
 const int kInt16MinValue = -0x7FFF - 1;

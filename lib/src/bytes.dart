@@ -37,7 +37,7 @@ abstract class Bytes extends ListBase<int>
   Uint8List buf;
   ByteData _bd;
 
-  /// Creates a new [Bytes] using [buf].
+  /// Internal Constructor
   Bytes(this.buf);
 
   /// Creates a new [Bytes] containing [length] elements.
@@ -220,7 +220,7 @@ abstract class Bytes extends ListBase<int>
 
   @override
   String toString() =>
-      '$endianness $runtimeType: $offset-${offset + length}:$length';
+      '$runtimeType($endianness): $offset-${offset + length}:$length';
 
   /// The maximum length of _this_.
   static const int kMaximumLength = k1GB;
@@ -235,7 +235,7 @@ abstract class Bytes extends ListBase<int>
   static const int kDefaultLimit = k1GB;
 
   /// The canonical empty (zero length) [Bytes] object.
-  static final Bytes kEmptyBytes = BytesLittleEndian.empty(0);
+  static final Bytes kEmptyBytes = Bytes.empty(0);
 }
 
 ///

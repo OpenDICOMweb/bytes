@@ -6,10 +6,8 @@
 //  Primary Author: Jim Philbin <jfphilbin@gmail.edu>
 //  See the AUTHORS file for other contributors.
 //
-import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
-import 'package:bytes/src/bytes.dart';
 import 'package:bytes/src/constants.dart';
 
 /// [BytesSetMixin] is a class that provides a read-only byte array that
@@ -32,21 +30,8 @@ mixin BytesSetMixin {
 
   // **** End of Interface
 
-  /// Sets the byte at [offset] in _this_ to [v].
-  void operator []=(int offset, int v) => buf[offset] = v;
 
   // **** Int set methods
-
-  /// Sets the byte at [offset] in _this_ to [v].
-  void setInt8(int offset, int v) => buf[offset] = v;
-
-  /// Returns the number of bytes set.
-  int setInt8List(int start, List<int> list, [int offset = 0, int length]) {
-    length ??= list.length;
-    _checkLength(offset, length, kInt8Size);
-    for (var i = offset, j = start; i < length; i++, j++) buf[j] = list[i];
-    return length;
-  }
 
  int setInt16List(int start, List<int> list, [int offset = 0, int length]) {
     length ??= list.length;
@@ -89,16 +74,6 @@ mixin BytesSetMixin {
     for (var i = offset, j = start; i < length; i++, j += 8)
       setInt64(j, list[i]);
     return length * 6;
-  }
-
-  /// Sets the byte at [offset] in _this_ to [v].
-  void setUint8(int offset, int v) => buf[offset] = v;
-
-  int setUint8List(int start, List<int> list, [int offset = 0, int length]) {
-    length ??= list.length;
-    _checkRange(offset, length);
-    for (var i = start, j = offset; i < length; i++, j++) buf[i] = list[j];
-    return length;
   }
 
   int setUint16List(int start, List<int> list, [int offset = 0, int length]) {
@@ -177,74 +152,8 @@ mixin BytesSetMixin {
     return length * 16;
   }
 
-  // **** String Setters
-
-  void setString(int start, String s, [int offset = 0, int length]) =>
-      setUtf8(start, s);
-
-  // **** List Setters
-
-  /// Copies [length] bytes from other starting at offset into _this_
-  /// starting at [start]. [length] defaults [bytes].length.
-  void setBytes(int start, Bytes bytes, [int offset = 0, int length]) {
-    length ?? bytes.length;
-    _checkRange(offset, length);
-    for (var i = start, j = offset; i < length; i++, j++) buf[i] = bytes[j];
-  }
-
-  void setByteData(int start, ByteData bd, [int offset = 0, int length]) =>
-      setUint8List(start, bd.buffer.asUint8List(), offset, length);
-
-  // **** String List Setters
-
-  // TODO: unit test
-  /// UTF-8 encodes the specified range of [s] and then writes the
-  /// code units to _this_ starting at [start]. Returns the offset
-  /// of the last byte + 1.
-  int setAscii(int start, String s) =>
-      setUint8List(start, cvt.ascii.encode(s));
-
-  /// Writes the ASCII [String]s in [sList] to _this_ starting at
-  /// [start].
-  /// Returns the number of bytes written.
-  int setAsciiList(int start, List<String> sList) =>
-      setAscii(start, sList.join('\\'));
-
-  // TODO: unit test
-  /// UTF-8 encodes the specified range of [s] and then writes the
-  /// code units to _this_ starting at [start]. Returns the offset
-  /// of the last byte + 1.
-  int setLatin(int start, String s) =>
-      setUint8List(start, cvt.latin1.encode(s));
-
-  /// Writes the LATIN [String]s in [sList] to _this_ starting at
-  /// [start].
-  ///
-  /// _Note_: All latin character sets are encoded as single 8-bit bytes.
-  int setLatinList(int start, List<String> sList) =>
-      setAscii(start, sList.join('\\'));
-
-  // TODO: unit test
-  /// UTF-8 encodes the specified range of [s] and then writes the
-  /// code units to _this_ starting at [start]. Returns the offset
-  /// of the last byte + 1.
-  int setUtf8(int start, String s) =>
-      setUint8List(start, cvt.utf8.encode(s));
-
-  /// Converts the [String]s in [sList] into a [Uint8List].
-  /// Then copies the bytes into _this_ starting at
-  /// [start].
-  /// Returns the number of bytes written.
-  int setUtf8List(int start, List<String> sList) =>
-      setUtf8(start, sList.join('\\'));
 
   // **** Internals
-
-  void _checkRange(int offset, int sizeInBytes) {
-    final length = offset + sizeInBytes;
-    if (length > buf.length)
-      throw RangeError('$length is larger then bytes remaining $buf.length');
-  }
 
   /// Checks that buf[bufOffset, buf.length] >= vLengthInBytes.
   /// [start] is the offset in [buf]. [length] is the number of elements.

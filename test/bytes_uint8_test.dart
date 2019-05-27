@@ -23,7 +23,7 @@ void main() {
       final vList1 = bytes0.asUint8List();
       expect(vList1, equals(vList0));
       // log.debug('vList1: $vList1');
-      final vList2 = bytes0.getUint8List();
+      final vList2 = bytes0.asUint8List();
       // log.debug('vList2: $vList2');
       expect(vList2, equals(vList1));
       final vList3 = bytes0.asUint8List();
@@ -45,7 +45,7 @@ void main() {
       // log.debug('bytes0: $bytes0');
       expect(bytes0.length, equals(vList0.length * vList0.elementSizeInBytes));
 
-      final vList1 = bytes0.getUint8List();
+      final vList1 = bytes0.asUint8List();
       // log.debug('vList1: $vList1');
       expect(vList1, equals(vList0));
 

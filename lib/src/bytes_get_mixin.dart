@@ -6,10 +6,7 @@
 //  Primary Author: Jim Philbin <jfphilbin@gmail.edu>
 //  See the AUTHORS file for other contributors.
 //
-import 'dart:convert' as cvt;
 import 'dart:typed_data';
-
-import 'package:bytes/src/bytes.dart';
 
 /// [BytesGetMixin] is a class that provides a read-only byte array that
 /// supports both [Uint8List] and [ByteData] interfaces.
@@ -35,35 +32,7 @@ mixin BytesGetMixin {
 
   // **** End of Interface
 
-  // **** TypedData copies
-
-  /// Creates a new [Bytes] from _this_ containing the specified region.
-  /// The [endian]ness is the same as _this_.
-  Bytes sublist([int start = 0, int end]) {
-    final list = getUint8List(start, (end ??= buf.length) - start);
-    return Bytes.typedDataView(list);
-  }
-
-  /// Creates an [Int8List] copy of the specified region of _this_.
-  Bytes getBytes([int offset = 0, int length]) {
-    final bd = getUint8List(offset, length);
-    return Bytes.typedDataView(bd);
-  }
-
-  /// Creates an [Int8List] copy of the specified region of _this_.
-  ByteData getByteData([int offset = 0, int length]) =>
-      getUint8List(offset, length).buffer.asByteData();
-
-  /// Returns an 8-bit integer values between -128 and 127 inclusive.
-  int getInt8(int i) => buf[i];
-
-  /// Creates an [Int8List] copy of the specified region of _this_.
-  Int8List getInt8List([int offset = 0, int length]) {
-    length ??= buf.length;
-    final list = Int8List(length);
-    for (var i = 0, j = offset; i < length; i++, j++) list[i] = buf[j];
-    return list;
-  }
+  // **** Signed Integer Lists
 
   /// Creates an [Int16List] copy of the specified region of _this_.
   Int16List getInt16List([int offset = 0, int length]) {
@@ -100,16 +69,6 @@ mixin BytesGetMixin {
 
   // **** Unsigned Integer Lists
 
-  /// Returns an 8-bit integer values between 0 and 255 inclusive.
-  int getUint8(int i) => buf[i];
-
-  /// Returns a [Uint8List] that is a copy of the specified region of _this_.
-  Uint8List getUint8List([int offset = 0, int length]) {
-    length ??= buf.length;
-    final copy = Uint8List(length);
-    for (var i = 0, j = offset; i < length; i++, j++) copy[i] = buf[j];
-    return copy;
-  }
 
   /// Creates an [Uint16List] copy of the specified region of _this_.
   Uint16List getUint16List([int offset = 0, int length]) {
@@ -173,53 +132,6 @@ mixin BytesGetMixin {
     return list;
   }
 
-  // **** Get Strings and List<String>
-
-  /// Returns a [String] containing a _Base64_ encoding of the specified
-  /// region of _this_.
-  String getBase64([int offset = 0, int length]) {
-    final bList = asUint8List(offset, length);
-    return bList.isEmpty ? '' : cvt.base64.encode(bList);
-  }
-
-  /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
-  String getString({int offset = 0, int length, bool allowInvalid = true}) {
-    length ??= buf.length;
-    final index = _absIndex(offset);
-    if (index < 0 || length > buf.lengthInBytes)
-      throw ArgumentError('Invalid Offset: $offset');
-    final v = buf.buffer.asUint8List(index, length);
-    return v.isEmpty ? '' : cvt.utf8.decode(v, allowMalformed: allowInvalid);
-  }
-
-  /// Returns a [List<String>]. This is done by first decoding
-  /// the specified region as _UTF-8_, and then _split_ing the
-  /// resulting [String] using the [separator].
-  List<String> getStringList(
-      {int offset = 0,
-      int length,
-      bool allowInvalid = true,
-      String separator = '\\'}) {
-    final s =
-        getString(offset: offset, length: length, allowInvalid: allowInvalid);
-    return (s.isEmpty) ? <String>[] : s.split(separator);
-  }
-
-  /// Returns a view of the specified region of _this_. [endian] defaults
-  /// to the same [endian]ness as _this_.
-  Bytes asBytes([int offset = 0, int length]) =>
-      Bytes.typedDataView(_viewOfBuf(offset, length));
-
-  /// Creates an [ByteData] view of the specified region of _this_.
-  ByteData asByteData([int offset = 0, int length]) =>
-      _viewOfBuf(offset, (length ??= buf.length) - offset);
-
-  /// Creates an [Int8List] view of the specified region of _this_.
-  Int8List asInt8List([int offset = 0, int length]) {
-    length ??= buf.length - offset;
-    return buf.buffer.asInt8List(_absIndex(offset), length);
-  }
-
   /// If [offset] is aligned on an 8-byte boundary, returns a [Int16List]
   /// view of the specified region; otherwise, creates a [Int16List] that
   /// is a copy of the specified region and returns it.
@@ -262,13 +174,6 @@ mixin BytesGetMixin {
     return (_isAligned64(index))
         ? buf.buffer.asInt64List(index, length)
         : getInt64List(offset, length);
-  }
-
-  // Allows the removal of padding characters.
-  Uint8List asUint8List([int offset = 0, int length]) {
-    length ??= buf.length;
-    final index = _absIndex(offset);
-    return buf.buffer.asUint8List(index, length);
   }
 
   /// If [offset] is aligned on an 8-byte boundary, returns a [Uint16List]
@@ -394,21 +299,5 @@ mixin BytesGetMixin {
   bool _isAligned32(int offset) => _isAligned(offset, 4);
   bool _isAligned64(int offset) => _isAligned(offset, 8);
   bool _isAligned128(int offset) => _isAligned(offset, 16);
-
-  // **** TypedData views
-
-  /// Returns an [ByteData] view of the specified region of _this_.
-  ByteData _viewOfBuf([int offset = 0, int length]) {
-    length ??= buf.length - offset;
-    return buf.buffer.asByteData(_absIndex(offset), length);
-  }
-
-/* Urgent should value range be checked
-  void _checkRange(int offset, int sizeInBytes) {
-    final length = offset + sizeInBytes;
-    if (length > buf.length)
-      throw RangeError('$length is larger then bytes remaining $buf.length');
-  }
-*/
 
 }

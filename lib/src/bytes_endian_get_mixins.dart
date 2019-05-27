@@ -27,11 +27,6 @@ mixin LittleEndianGetMixin {
     return Int32x4(w, x, y, z);
   }
 
-  /// Returns an 8-bit unsigned integer values at
-  ///     `index = [buf].offsetInBytes + [i]`
-  /// in the underlying [Uint8List].
-  /// _Note_: [i] may be negative.
-  int getUint8(int i) => buf[i];
   int getUint16(int i) => bd.getUint16(i, Endian.little);
   int getUint32(int i) => bd.getUint32(i, Endian.little);
   int getUint64(int i) => bd.getUint64(i, Endian.little);
@@ -68,10 +63,6 @@ mixin BigEndianGetMixin {
 
   Endian get endian => Endian.little;
 
-  /// Returns an 8-bit integer values at `index = [buf].offsetInBytes + [i]`
-  /// in the underlying [Uint8List]. _Note_: [i] may be negative.
-  int getInt8(int i) => buf[i];
-
   int getInt16(int i) => bd.getInt16(i, Endian.big);
   int getInt32(int i) => bd.getInt32(i, Endian.big);
   int getInt64(int i) => bd.getInt64(i, Endian.big);
@@ -86,11 +77,6 @@ mixin BigEndianGetMixin {
     return Int32x4(w, x, y, z);
   }
 
-  /// Returns an 8-bit unsigned integer values at
-  ///     `index = [buf].offsetInBytes + [i]`
-  /// in the underlying [Uint8List].
-  /// _Note_: [i] may be negative.
-  int getUint8(int i) => buf[i];
   int getUint16(int i) => bd.getUint16(i, Endian.big);
   int getUint32(int i) => bd.getUint32(i, Endian.big);
   int getUint64(int i) => bd.getUint64(i, Endian.big);

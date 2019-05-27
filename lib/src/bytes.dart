@@ -141,27 +141,6 @@ abstract class Bytes extends ListBase<int>
   @override
   ByteData get bd => _bd ??= buf.buffer.asByteData(buf.offsetInBytes);
 
-  // *** Comparable interface
-
-  /// Compares _this_ with [other] byte by byte.
-  /// Returns a negative integer if _this_ is ordered before other, a
-  /// positive integer if _this_ is ordered after other, and zero if
-  /// _this_ and other are equal.
-  ///
-  /// Returns -2 _this_ is a proper prefix of [other], and +2 if [other]
-  /// is a proper prefix of _this_.
-  @override
-  int compareTo(Bytes other) {
-    final minLength = (length < other.length) ? length : other.length;
-    for (var i = 0; i < minLength; i++) {
-      final a = this[i];
-      final b = other[i];
-      if (a == b) continue;
-      return (a < b) ? -1 : 1;
-    }
-    return (length < other.length) ? -2 : 2;
-  }
-
   // **** TypedData interface.
 
   /// The number of bytes per element in _this_.
@@ -185,6 +164,247 @@ abstract class Bytes extends ListBase<int>
 
   /// Returns a [String] indicating the endianness of _this_.
   String get endianness => (endian == Endian.little) ? 'LE' : 'BE';
+
+  // **** Getters that have no Endianness
+
+  /// Creates an [Bytes] copy of the specified region of _this_.
+  Bytes getBytes([int offset = 0, int length]) {
+    final newBuf = getUint8List(offset, length);
+    return Bytes.typedDataView(newBuf);
+  }
+
+  /// Creates a new [Bytes] from _this_ containing the specified region.
+  /// The [endian]ness is the same as _this_.
+  @override
+  Bytes sublist([int start = 0, int end]) =>
+      getBytes(start, (end ??= buf.length) - start);
+
+  /// Returns a view of the specified region of _this_. [endian] defaults
+  /// to the same [endian]ness as _this_.
+  Bytes asBytes([int offset = 0, int length]) =>
+      Bytes.typedDataView(asUint8List(offset, length ?? this.length));
+
+  /// Returns an [ByteData] view of the specified region of _this_.
+  ByteData asByteData([int offset = 0, int length]) {
+    length ??= buf.length - offset;
+    return buf.buffer.asByteData(buf.offsetInBytes + offset, length);
+  }
+
+  /// Returns the 8-bit _signed_ integer value
+  /// (between -128 and 127 inclusive) at index [i].
+  int getInt8(int i) => buf[i];
+
+  /// Creates an [Int8List] copy of the specified region of _this_.
+  Int8List getInt8List([int offset = 0, int length]) {
+    length ??= buf.length;
+    final list = Int8List(length);
+    for (var i = 0, j = offset; i < length; i++, j++) list[i] = buf[j];
+    return list;
+  }
+
+  /// Creates an [Int8List] view of the specified region of _this_.
+  Int8List asInt8List([int offset = 0, int length]) {
+    length ??= buf.length - offset;
+    return buf.buffer.asInt8List(buf.offsetInBytes + offset, length);
+  }
+
+  /// Returns an 8-bit _unsigned_ integer value
+  /// (between 0 and 255 inclusive) at index [i].
+  int getUint8(int i) => buf[i];
+
+  /// Returns a [Uint8List] that is a copy of the specified region of _this_.
+  Uint8List getUint8List([int offset = 0, int length]) {
+    length ??= buf.length;
+    final copy = Uint8List(length);
+    for (var i = 0, j = offset; i < length; i++, j++) copy[i] = buf[j];
+    return copy;
+  }
+
+/*
+  // Allows the removal of padding characters.
+  Uint8List asUint8List([int offset = 0, int length]) {
+    length ??= buf.length;
+    return buf.buffer.asUint8List(buf.offsetInBytes + offset, length);
+  }
+*/
+
+  /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
+  Uint8List asUint8List([int offset = 0, int length]) =>
+      buf.buffer.asUint8List(buf.offsetInBytes + offset, length ?? buf.length);
+
+/*
+  Uint8List asUint8List([int offset = 0, int length]) {
+    length ??= buf.length;
+    final index = buf.offsetInBytes + offset;
+    if (index < 0 || length > buf.lengthInBytes)
+      throw ArgumentError('Invalid Offset: $offset');
+    return buf.buffer.asUint8List(index, length);
+  }
+*/
+
+  /// Creates an [Int8List] copy of the specified region of _this_.
+  ByteData getByteData([int offset = 0, int length]) =>
+      getUint8List(offset, length).buffer.asByteData();
+
+  // **** Get Strings and List<String>
+
+  /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
+  String getString({int offset = 0, int length, bool allowInvalid = true}) =>
+      getUtf8(offset: offset, length: length, allowInvalid: allowInvalid);
+
+/*
+  /// Returns a [List<String>]. This is done by first decoding
+  /// the specified region as _UTF-8_, and then _split_ing the
+  /// resulting [String] using the [separator].
+  List<String> getStringList(
+      {int offset = 0,
+        int length,
+        bool allowInvalid = true,
+        String separator = '\\'}) {
+    final s =
+    getString(offset: offset, length: length, allowInvalid: allowInvalid);
+    return (s.isEmpty) ? <String>[] : s.split(separator);
+  }
+*/
+
+  /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
+  /// Also, allows the removal of padding characters.
+  String getUtf8({int offset = 0, int length, bool allowInvalid = true}) =>
+      cvt.utf8.decode(asUint8List(offset, length ?? this.length),
+          allowMalformed: allowInvalid);
+
+  /// Returns a [String] containing a _ASCII_ decoding of the specified
+  /// region of _this_. Also allows the removal of a padding character.
+  String getAscii({int offset = 0, int length, bool allowInvalid = true}) =>
+      cvt.ascii.decode(asUint8List(offset, length ?? this.length),
+          allowInvalid: allowInvalid);
+
+  /// Returns a [String] containing a _Latin_ decoding of the specified
+  /// region of _this_. Also allows the removal of a padding character.
+  String getLatin({int offset = 0, int length, bool allowInvalid = true}) =>
+      cvt.latin1.decode(asUint8List(offset, length ?? this.length),
+          allowInvalid: allowInvalid);
+
+  /// Returns a [String] containing a _ASCII_ decoding of the specified
+  /// region of _this_. Also allows the removal of a padding character.
+  String getBase64([int offset = 0, int length]) =>
+      cvt.base64.encode(asUint8List(offset, length ?? this.length));
+
+  // **** Setters that have no Endianness
+
+  /// Sets the byte at [offset] in _this_ to [v].
+  @override
+  void operator []=(int offset, int v) => buf[offset] = v;
+
+  /// Copies [length] bytes from other starting at offset into _this_
+  /// starting at [start]. [length] defaults [bytes].length.
+  void setBytes(int start, Bytes bytes, [int offset = 0, int length]) {
+    length ?? bytes.length;
+    _checkRange(offset, length);
+    for (var i = start, j = offset; i < length; i++, j++) buf[i] = bytes[j];
+  }
+
+  /// Sets the bytes at [offset] in _this_ to the bytes in [bd] from
+  /// [offset] to [length].
+  void setByteData(int start, ByteData bd, [int offset = 0, int length]) =>
+      setUint8List(start, bd.buffer.asUint8List(), offset, length);
+
+  /// Sets the byte at [offset] in _this_ to [v].
+  void setInt8(int offset, int v) => buf[offset] = v;
+
+  /// Returns the number of bytes set.
+  int setInt8List(int start, List<int> list, [int offset = 0, int length]) {
+    length ??= list.length;
+    _checkRange(offset, length);
+    for (var i = offset, j = start; i < length; i++, j++) buf[j] = list[i];
+    return length;
+  }
+
+  /// Sets the byte at [offset] in _this_ to [v].
+  void setUint8(int offset, int v) => buf[offset] = v;
+
+  /// Sets the bytes in _this_ from [start] to [start] + [length]
+  /// to the elements in [list] from [offset] to [offset] + [length]
+  int setUint8List(int start, List<int> list, [int offset = 0, int length]) {
+    length ??= list.length;
+    _checkRange(offset, length);
+    for (var i = start, j = offset; i < length; i++, j++) buf[i] = list[j];
+    return length;
+  }
+
+  // **** String Setters
+
+  /// UTF-8 encodes the specified range of [s] and then writes the
+  /// code units to _this_ starting at [start]. Returns the offset
+  /// of the last byte + 1.
+  void setString(int start, String s, [int offset = 0, int length]) =>
+      setUtf8(start, s);
+
+  // TODO: unit test
+  /// UTF-8 encodes the specified range of [s] and then writes the
+  /// code units to _this_ starting at [start]. Returns the offset
+  /// of the last byte + 1.
+  int setUtf8(int start, String s) => setUint8List(start, cvt.utf8.encode(s));
+
+/*
+  /// Converts the [String]s in [sList] into a [Uint8List].
+  /// Then copies the bytes into _this_ starting at
+  /// [start].
+  /// Returns the number of bytes written.
+  int setUtf8List(int start, List<String> sList) =>
+      setUtf8(start, sList.join('\\'));
+*/
+
+  // TODO: unit test
+  /// UTF-8 encodes the specified range of [s] and then writes the
+  /// code units to _this_ starting at [start]. Returns the offset
+  /// of the last byte + 1.
+  int setAscii(int start, String s) => setUint8List(start, cvt.ascii.encode(s));
+
+/*
+  /// Writes the ASCII [String]s in [sList] to _this_ starting at
+  /// [start].
+  /// Returns the number of bytes written.
+  int setAsciiList(int start, List<String> sList) =>
+      setAscii(start, sList.join('\\'));
+*/
+
+  // TODO: unit test
+  /// UTF-8 encodes the specified range of [s] and then writes the
+  /// code units to _this_ starting at [start]. Returns the offset
+  /// of the last byte + 1.
+  int setLatin(int start, String s) =>
+      setUint8List(start, cvt.latin1.encode(s));
+
+/*
+  /// Writes the LATIN [String]s in [sList] to _this_ starting at
+  /// [start].
+  ///
+  /// _Note_: All latin character sets are encoded as single 8-bit bytes.
+  int setLatinList(int start, List<String> sList) =>
+      setAscii(start, sList.join('\\'));
+*/
+
+  // *** Comparable interface
+
+  /// Compares _this_ with [other] byte by byte.
+  /// Returns a negative integer if _this_ is ordered before other, a
+  /// positive integer if _this_ is ordered after other, and zero if
+  /// _this_ and other are equal.
+  ///
+  /// Returns -2 _this_ is a proper prefix of [other], and +2 if [other]
+  /// is a proper prefix of _this_.
+  @override
+  int compareTo(Bytes other) {
+    final minLength = (length < other.length) ? length : other.length;
+    for (var i = 0; i < minLength; i++) {
+      final a = this[i];
+      final b = other[i];
+      if (a == b) continue;
+      return (a < b) ? -1 : 1;
+    }
+    return (length < other.length) ? -2 : 2;
+  }
 
   // **** Growable Methods
 
@@ -221,6 +441,14 @@ abstract class Bytes extends ListBase<int>
   @override
   String toString() =>
       '$runtimeType($endianness): $offset-${offset + length}:$length';
+
+  // **** Internals
+
+  void _checkRange(int offset, int sizeInBytes) {
+    final length = offset + sizeInBytes;
+    if (length > buf.length)
+      throw RangeError('$length is larger then bytes remaining $buf.length');
+  }
 
   /// The maximum length of _this_.
   static const int kMaximumLength = k1GB;

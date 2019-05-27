@@ -33,6 +33,49 @@ int largeChunkIncrement = 4 * k1MB;
 abstract class Bytes extends ListBase<int>
     with BytesGetMixin, BytesSetMixin
     implements Comparable<Bytes> {
+  // **** Interface
+  // Urgent decide if this interface is needed
+/*
+  @override
+  int getInt16(int i);
+  @override
+  int getInt32(int i);
+  @override
+  int getInt64(int i);
+
+  @override
+  int getUint16(int i);
+  @override
+  int getUint32(int i);
+  @override
+  int getUint64(int i);
+
+  @override
+  double getFloat32(int i);
+  @override
+  double getFloat64(int i);
+
+  @override
+  void setInt16(int i, int v);
+  @override
+  void setInt32(int i, int v);
+  @override
+  void setInt64(int i, int v);
+
+  @override
+  void setUint16(int i, int v);
+  @override
+  void setUint32(int i, int v);
+  @override
+  void setUint64(int i, int v);
+
+  @override
+  void setFloat32(int i, double v);
+  @override
+  void setFloat64(int i, double v);
+*/
+
+  // **** End interface
   @override
   Uint8List buf;
   ByteData _bd;

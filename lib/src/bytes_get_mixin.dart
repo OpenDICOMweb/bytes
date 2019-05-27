@@ -18,17 +18,13 @@ mixin BytesGetMixin {
   int getInt16(int i);
   int getInt32(int i);
   int getInt64(int i);
-  Int32x4 getInt32x4(int i);
 
   int getUint16(int i);
   int getUint32(int i);
   int getUint64(int i);
 
   double getFloat32(int i);
-  Float32x4 getFloat32x4(int i);
-
   double getFloat64(int i);
-  Float64x2 getFloat64x2(int i);
 
   // **** End of Interface
 
@@ -50,6 +46,9 @@ mixin BytesGetMixin {
     return list;
   }
 
+  Int32x4 getInt32x4(int offset) => Int32x4(getInt32(offset),
+      getInt32(offset + 4), getInt32(offset + 8), getInt32(offset + 12));
+
   /// Creates an [Int32x4List] copy of the specified region of _this_.
   Int32x4List getInt32x4List([int offset = 0, int length]) {
     length ??= _length128(offset);
@@ -68,7 +67,6 @@ mixin BytesGetMixin {
   }
 
   // **** Unsigned Integer Lists
-
 
   /// Creates an [Uint16List] copy of the specified region of _this_.
   Uint16List getUint16List([int offset = 0, int length]) {
@@ -105,6 +103,9 @@ mixin BytesGetMixin {
     return list;
   }
 
+  Float32x4 getFloat32x4(int offset) => Float32x4(getFloat32(offset),
+      getFloat32(offset + 4), getFloat32(offset + 8), getFloat32(offset + 12));
+
   /// Creates an [Float32x4List] copy of the specified region of _this_.
   Float32x4List getFloat32x4List([int offset = 0, int length]) {
     length ??= _length128(offset);
@@ -122,6 +123,9 @@ mixin BytesGetMixin {
       list[i] = getFloat64(j);
     return list;
   }
+
+  Float64x2 getFloat64x2(int offset) =>
+      Float64x2(getFloat64(offset), getFloat64(offset + 8));
 
   /// Creates an [Float64x2List] copy of the specified region of _this_.
   Float64x2List getFloat64x2List([int offset = 0, int length]) {
@@ -299,5 +303,4 @@ mixin BytesGetMixin {
   bool _isAligned32(int offset) => _isAligned(offset, 4);
   bool _isAligned64(int offset) => _isAligned(offset, 8);
   bool _isAligned128(int offset) => _isAligned(offset, 16);
-
 }

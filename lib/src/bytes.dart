@@ -349,8 +349,13 @@ abstract class Bytes extends ListBase<int>
 
   /// Sets the bytes at [offset] in _this_ to the bytes in [bd] from
   /// [offset] to [length].
-  void setByteData(int start, ByteData bd, [int offset = 0, int length]) =>
-      setUint8List(start, bd.buffer.asUint8List(), offset, length);
+  int setByteData(int start, ByteData bd, [int offset = 0, int length]) {
+    length ??= bd.lengthInBytes;
+    _checkRange(offset, length);
+    for (var i = start, j = offset; i < length; i++, j++)
+      buf[i] = bd.getUint8(j);
+    return length;
+  }
 
   /// Sets the byte at [offset] in _this_ to [v].
   void setInt8(int offset, int v) => buf[offset] = v;
@@ -529,8 +534,7 @@ class AlignmentError extends Error {
 }
 
 /// Throws an [Alignment Error].
-// ignore: prefer_void_to_null
-Null alignmentError(
+void alignmentError(
     Uint8List buf, int offsetInBytes, int lengthInBytes, int sizeInBytes) {
   throw AlignmentError(buf, offsetInBytes, lengthInBytes, sizeInBytes);
 }

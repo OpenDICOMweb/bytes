@@ -61,7 +61,7 @@ mixin BigEndianGetMixin {
   Uint8List get buf;
   ByteData get bd;
 
-  Endian get endian => Endian.little;
+  Endian get endian => Endian.big;
 
   int getInt16(int i) => bd.getInt16(i, Endian.big);
   int getInt32(int i) => bd.getInt32(i, Endian.big);

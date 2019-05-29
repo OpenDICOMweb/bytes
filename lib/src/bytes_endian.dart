@@ -23,8 +23,6 @@ import 'package:bytes/src/bytes_endian_set_mixins.dart';
 /// byte array that supports both [Uint8List] and [ByteData] interfaces.
 class BytesLittleEndian extends Bytes
     with LittleEndianGetMixin, LittleEndianSetMixin {
-
-
   /// Creates a new [BytesLittleEndian] from [buf].
   BytesLittleEndian(Uint8List buf) : super(buf);
 
@@ -37,26 +35,26 @@ class BytesLittleEndian extends Bytes
 
   /// Returns a view of the specified region of _this_.
   BytesLittleEndian.view(Bytes bytes, [int offset = 0, int length])
-      : super( _bytesView(bytes.buf, offset, length ?? bytes.length));
+      : super(_bytesView(bytes.buf, offset, length ?? bytes.length));
 
   /// Creates a new [Bytes] from [bytes] containing the specified region
   /// and [endian]ness. [endian] defaults to [Endian.little].
   BytesLittleEndian.from(Bytes bytes, [int offset = 0, int length])
-      : super( copyUint8List(bytes.buf, offset, length ?? bytes.length));
+      : super(copyUint8List(bytes.buf, offset, length ?? bytes.length));
 
   /// Creates a new [Bytes] from a [TypedData] containing the specified
   /// region (from offset of length) and [endian]ness.
   /// [endian] defaults to [Endian.little].
   BytesLittleEndian.typedDataView(TypedData td,
       [int offset = 0, int lengthInBytes])
-      : super( td.buffer.asUint8List(
+      : super(td.buffer.asUint8List(
             td.offsetInBytes + offset, lengthInBytes ?? td.lengthInBytes));
 
   /// Creates a new [Bytes] from a [List<int>].  [endian] defaults
   /// to [Endian.little]. Any values in [list] that are larger than 8-bits
   /// are truncated.
   BytesLittleEndian.fromList(List<int> list)
-      : super( (list is Uint8List) ? list : Uint8List.fromList(list));
+      : super((list is Uint8List) ? list : Uint8List.fromList(list));
 
   /// Returns a [Bytes] containing the Base64 decoding of [s].
   factory BytesLittleEndian.fromBase64(String s,
@@ -91,7 +89,7 @@ class BytesLittleEndian extends Bytes
           : Bytes.fromString(vList.join(separator));
 
   /// Returns a [String] indicating the endianness of _this_.
- @override
+  @override
   String get endianness => 'LE';
 
   /// The canonical empty (zero length) [Bytes] object.
@@ -105,7 +103,7 @@ class BytesBigEndian extends Bytes with BigEndianGetMixin, BigEndianSetMixin {
   Uint8List get buf;
 
   /// Creates a new [BytesBigEndian] from [buf].
-  BytesBigEndian(Uint8List buf) : super(buf) ;
+  BytesBigEndian(Uint8List buf) : super(buf);
 
   /// Creates a new [BytesBigEndian] containing [length] elements.
   /// [length] defaults to [kDefaultLength] and [endian] defaults
@@ -143,7 +141,6 @@ class BytesBigEndian extends Bytes with BigEndianGetMixin, BigEndianSetMixin {
 
   /// The canonical empty (zero length) [Bytes] object.
   static final BytesBigEndian kEmptyBytes = BytesBigEndian.empty(0);
-
 }
 
 //TODO: move this to the appropriate place

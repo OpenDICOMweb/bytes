@@ -235,7 +235,7 @@ abstract class Bytes extends ListBase<int>
 
   /// Returns the 8-bit _signed_ integer value
   /// (between -128 and 127 inclusive) at index [i].
-  int getInt8(int i) => buf[i];
+  int getInt8(int i) => bd.getInt8(i);
 
   /// Creates an [Int8List] copy of the specified region of _this_.
   Int8List getInt8List([int offset = 0, int length]) {

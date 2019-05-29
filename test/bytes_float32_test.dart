@@ -12,54 +12,149 @@ import 'package:bytes/bytes.dart';
 import 'package:bytes/src/constants.dart';
 import 'package:rng/rng.dart';
 import 'package:test/test.dart';
+import 'package:test_tools/tools.dart';
 
 void main() {
   final rng = RNG();
+  const repetitions = 100;
+  const min = 0;
+  const max = 100;
 
-  group('Bytes Float32 Tests', () {
+  group('Bytes.typedDataView LE Float32', () {
+    test('LE Float32 tests', () {
+      for (var i = 0; i < repetitions; i++) {
+        final vList0 = rng.float32List(min, max);
+        expect(vList0 is Float32List, true);
+        final u8LE = getFloat32LE(vList0);
+        expect(vList0.buffer == u8LE.buffer, true);
+        expect(isAligned32(vList0.offsetInBytes), true);
 
-    test('Basic Float32 tests', () {
-      final vList0 = rng.float32List(5, 10);
-      // log.debug('vList0: $vList0');
-      final bytes0 = Bytes.typedDataView(vList0);
-      final vList1 = bytes0.asFloat32List();
-      // log.debug('vList1: $vList1');
-      expect(vList1, equals(vList0));
-      final vList2 = bytes0.getFloat32List();
-      // log.debug('vList2: $vList2');
-      expect(vList2, equals(vList1));
-      final vList3 = bytes0.asFloat32List();
-      // log.debug('vList3: $vList3');
-      expect(vList3, equals(vList2));
+        final bytes0 = BytesLittleEndian.typedDataView(u8LE);
+        expect(bytes0.endian == Endian.little, true);
+        expect(bytes0.length == u8LE.length, true);
+        expect(bytes0.buffer == u8LE.buffer, true);
+        expect(isAligned32(bytes0.buf.offsetInBytes), true);
+//        print('isAligned32 ${isAligned32(bytes0.buf.offsetInBytes)}');
+        final vList1 = bytes0.asFloat32List();
+        expect(vList1, equals(vList0));
 
-      final bytes4 = Bytes.empty(bytes0.length)..setFloat32List(0, vList0);
-      final vList4 = bytes4.asFloat32List();
-      expect(vList4, equals(vList3));
+        expect(
+            vList1.buffer == vList0.buffer, isAligned32(vList1.offsetInBytes));
+
+        final vList2 = bytes0.getFloat32List();
+        expect(vList2, equals(vList1));
+        expect(vList2.buffer == vList1.buffer, false);
+
+        final bytes1 = Bytes.empty(bytes0.length, Endian.little)
+          ..setFloat32List(0, vList2);
+        final vList3 = bytes1.asFloat32List();
+        expect(vList3, equals(vList2));
+        expect(vList3.buffer == bytes1.buffer, true);
+      }
     });
 
     //TODO: finish tests
-    test('Test Float32List', () {
+    test('Bytes.empty LE Float32', () {
       const length = 10;
-      const loopCount = 100;
       const vInitial = 1.234;
       final box = ByteData(kFloat32Size);
 
-      for (var i = 0; i < loopCount; i++) {
-        final a = Bytes.empty(length * kFloat32Size);
-        // log.debug('a: $a');
-        assert(a.length == length * kFloat32Size, true);
+      for (var i = 0; i < repetitions; i++) {
+        final bytes = Bytes.empty(length * kFloat32Size, Endian.little);
+        assert(bytes.length == length * kFloat32Size, true);
 
         var v0 = vInitial;
         for (var i = 0, j = 0; i < length; i++, j += kFloat32Size) {
           // Write to box to lose precision
           box.setFloat32(0, v0);
           final v1 = box.getFloat32(0);
-          a.setFloat32(i * kFloat32Size, v1);
-          // log.debug('i: $i, j: $j v: $v1, a[$i]: ${a.getFloat32(i)}');
-          expect(a.getFloat32(i * kFloat32Size) == v1, true);
+          final offset = i * kFloat32Size;
+          bytes.setFloat32(offset, v1);
+          final v2 = bytes.getFloat32(offset);
+          expect(v2 == v1, true);
           v0 += .1;
         }
       }
     });
+
+    test('Bytes LE Float32List test', () {
+      for (var i = 0; i < repetitions; i++) {
+        final vList0 = rng.float32List(min, max);
+        final bytes = BytesLittleEndian(getFloat32LE(vList0));
+        final vList1 = bytes.asFloat32List();
+        expect(vList1.buffer, equals(vList0.buffer));
+        expect(vList1.length, equals(vList0.length));
+        expect(vList1, equals(vList0));
+      }
+    });
   });
+
+  group('Bytes.typedDataView BE Float32', () {
+    test('BE Float32 tests', () {
+      for (var i = 0; i < repetitions; i++) {
+        final vList0 = rng.float32List(min, max);
+        expect(vList0 is Float32List, true);
+        final u8List = getFloat32BE(vList0);
+        expect(vList0.buffer == u8List.buffer, true);
+        expect(isAligned32(vList0.offsetInBytes), true);
+
+        final bytes0 = BytesBigEndian.typedDataView(u8List);
+        expect(bytes0.length == u8List.length, true);
+        expect(bytes0.buffer == u8List.buffer, true);
+        expect(isAligned32(bytes0.buf.offsetInBytes), true);
+        print('isAligned32 ${isAligned32(bytes0.buf.offsetInBytes)}');
+        final vList1 = bytes0.asFloat32List();
+        expect(vList1, equals(vList0));
+
+        expect(
+            vList1.buffer == vList0.buffer, isAligned32(vList1.offsetInBytes));
+
+        final vList2 = bytes0.getFloat32List();
+        expect(vList2, equals(vList1));
+        expect(vList2.buffer == vList1.buffer, false);
+
+        final bytes1 = Bytes.empty(bytes0.length, Endian.big)
+          ..setFloat32List(0, vList2);
+        final vList3 = bytes1.asFloat32List();
+        expect(vList3, equals(vList2));
+        expect(vList3.buffer == bytes1.buffer, true);
+      }
+    });
+
+    //TODO: finish tests
+    test('Bytes.empty BE Float32', () {
+      const length = 10;
+      const vInitial = 1.234;
+      final box = ByteData(kFloat32Size);
+
+      for (var i = 0; i < repetitions; i++) {
+        final bytes = Bytes.empty(length * kFloat32Size, Endian.big);
+        assert(bytes.length == length * kFloat32Size, true);
+
+        var v0 = vInitial;
+        for (var i = 0, j = 0; i < length; i++, j += kFloat32Size) {
+          // Write to box to lose precision
+          box.setFloat32(0, v0);
+          final v1 = box.getFloat32(0);
+          final offset = i * kFloat32Size;
+          bytes.setFloat32(offset, v1);
+          final v2 = bytes.getFloat32(offset);
+          expect(v2 == v1, true);
+          v0 += .1;
+        }
+      }
+    });
+
+    test('Bytes BE Float32List test', () {
+      for (var i = 0; i < repetitions; i++) {
+        final vList0 = rng.float32List(min, max);
+        final bytes = BytesBigEndian(getFloat32BE(vList0));
+        final vList1 = bytes.asFloat32List();
+        expect(vList1.buffer, equals(vList0.buffer));
+        expect(vList1.length, equals(vList0.length));
+        expect(vList1, equals(vList0));
+      }
+    });
+  });
+
 }

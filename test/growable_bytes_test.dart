@@ -14,20 +14,12 @@ void main() {
   group('Bytes Growing Tests', () {
     test('Test ensureLength for doubling size', () {
       final bytes = Bytes.empty();
-      for (var i = 1; i < k1GB; i = i * 2) {
-        bytes.ensureLength(i);
-        if (i % 0x1000000 == 0)
-          print('length: ${bytes.length}  ${bytes.length.toRadixString(16)}');
-      }
+      for (var i = 1; i < k1GB; i = i * 2) bytes.ensureLength(i);
     });
 
     test('Test ensureLength above 1MB', () {
       final bytes = Bytes.empty(k1MB);
-      for (var i = 1; i < 128 * k1MB; i++) {
-        bytes.ensureLength(i);
-        if (i % 0x1000000 == 0)
-          print('length: ${bytes.length}  ${bytes.length.toRadixString(16)}');
-      }
+      for (var i = 1; i < 128 * k1MB; i++) bytes.ensureLength(i);
     });
   });
 }

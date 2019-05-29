@@ -241,7 +241,7 @@ abstract class Bytes extends ListBase<int>
   Int8List getInt8List([int offset = 0, int length]) {
     length ??= buf.length;
     final list = Int8List(length);
-    for (var i = 0, j = offset; i < length; i++, j++) list[i] = buf[j];
+    for (var i = 0, j = offset; i < length; i++, j++) list[i] = bd.getInt8(j);
     return list;
   }
 
@@ -263,27 +263,9 @@ abstract class Bytes extends ListBase<int>
     return copy;
   }
 
-/*
-  // Allows the removal of padding characters.
-  Uint8List asUint8List([int offset = 0, int length]) {
-    length ??= buf.length;
-    return buf.buffer.asUint8List(buf.offsetInBytes + offset, length);
-  }
-*/
-
   /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
   Uint8List asUint8List([int offset = 0, int length]) =>
       buf.buffer.asUint8List(buf.offsetInBytes + offset, length ?? buf.length);
-
-/*
-  Uint8List asUint8List([int offset = 0, int length]) {
-    length ??= buf.length;
-    final index = buf.offsetInBytes + offset;
-    if (index < 0 || length > buf.lengthInBytes)
-      throw ArgumentError('Invalid Offset: $offset');
-    return buf.buffer.asUint8List(index, length);
-  }
-*/
 
   /// Creates an [Int8List] copy of the specified region of _this_.
   ByteData getByteData([int offset = 0, int length]) =>
@@ -294,21 +276,6 @@ abstract class Bytes extends ListBase<int>
   /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
   String getString({int offset = 0, int length, bool allowInvalid = true}) =>
       getUtf8(offset: offset, length: length, allowInvalid: allowInvalid);
-
-/*
-  /// Returns a [List<String>]. This is done by first decoding
-  /// the specified region as _UTF-8_, and then _split_ing the
-  /// resulting [String] using the [separator].
-  List<String> getStringList(
-      {int offset = 0,
-        int length,
-        bool allowInvalid = true,
-        String separator = '\\'}) {
-    final s =
-    getString(offset: offset, length: length, allowInvalid: allowInvalid);
-    return (s.isEmpty) ? <String>[] : s.split(separator);
-  }
-*/
 
   /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
   /// Also, allows the removal of padding characters.
@@ -364,7 +331,7 @@ abstract class Bytes extends ListBase<int>
   int setInt8List(int start, List<int> list, [int offset = 0, int length]) {
     length ??= list.length;
     _checkRange(offset, length);
-    for (var i = offset, j = start; i < length; i++, j++) buf[j] = list[i];
+    for (var i = start, j = offset; i < length; i++, j++) buf[i] = list[j];
     return length;
   }
 
@@ -394,28 +361,11 @@ abstract class Bytes extends ListBase<int>
   /// of the last byte + 1.
   int setUtf8(int start, String s) => setUint8List(start, cvt.utf8.encode(s));
 
-/*
-  /// Converts the [String]s in [sList] into a [Uint8List].
-  /// Then copies the bytes into _this_ starting at
-  /// [start].
-  /// Returns the number of bytes written.
-  int setUtf8List(int start, List<String> sList) =>
-      setUtf8(start, sList.join('\\'));
-*/
-
   // TODO: unit test
   /// UTF-8 encodes the specified range of [s] and then writes the
   /// code units to _this_ starting at [start]. Returns the offset
   /// of the last byte + 1.
   int setAscii(int start, String s) => setUint8List(start, cvt.ascii.encode(s));
-
-/*
-  /// Writes the ASCII [String]s in [sList] to _this_ starting at
-  /// [start].
-  /// Returns the number of bytes written.
-  int setAsciiList(int start, List<String> sList) =>
-      setAscii(start, sList.join('\\'));
-*/
 
   // TODO: unit test
   /// UTF-8 encodes the specified range of [s] and then writes the
@@ -423,15 +373,6 @@ abstract class Bytes extends ListBase<int>
   /// of the last byte + 1.
   int setLatin(int start, String s) =>
       setUint8List(start, cvt.latin1.encode(s));
-
-/*
-  /// Writes the LATIN [String]s in [sList] to _this_ starting at
-  /// [start].
-  ///
-  /// _Note_: All latin character sets are encoded as single 8-bit bytes.
-  int setLatinList(int start, List<String> sList) =>
-      setAscii(start, sList.join('\\'));
-*/
 
   // *** Comparable interface
 

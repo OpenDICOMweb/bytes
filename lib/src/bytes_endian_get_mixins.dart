@@ -13,6 +13,9 @@ mixin LittleEndianGetMixin {
 
   Endian get endian => Endian.little;
 
+  /// Returns a [String] indicating the endianness of _this_.
+  String get endianness => 'LE';
+
   int getInt16(int i) => bd.getInt16(i, Endian.little);
   int getInt32(int i) => bd.getInt32(i, Endian.little);
   int getInt64(int i) => bd.getInt64(i, Endian.little);
@@ -62,6 +65,10 @@ mixin BigEndianGetMixin {
   ByteData get bd;
 
   Endian get endian => Endian.big;
+
+  /// Returns a [String] indicating the endianness of _this_.
+  String get endianness => 'BE';
+
 
   int getInt16(int i) => bd.getInt16(i, Endian.big);
   int getInt32(int i) => bd.getInt32(i, Endian.big);

@@ -141,13 +141,11 @@ abstract class Bytes extends ListBase<int>
   }
 
   /// Returns [Bytes] containing a UTF8 encoding of [s];
-  factory Bytes.fromString(String s, [Endian endian = Endian.little]) {
+  factory Bytes.fromString(String s) {
     if (s == null) return null;
     if (s.isEmpty) return kEmptyBytes;
     final Uint8List list = cvt.utf8.encode(s);
-    return (endian == Endian.little)
-        ? BytesLittleEndian.typedDataView(list)
-        : BytesBigEndian.typedDataView(list);
+    return Bytes.typedDataView(list);
   }
 
   /// Returns a [Bytes] containing UTF-8 encoding of the concatination of
@@ -156,8 +154,8 @@ abstract class Bytes extends ListBase<int>
       [String separator = '\\', Endian endian = Endian.little]) {
     if (vList.isEmpty) return Bytes.kEmptyBytes;
     return (endian == Endian.little)
-        ? Bytes.fromString(vList.join(separator), endian)
-        : Bytes.fromString(vList.join(separator), endian);
+        ? Bytes.fromString(vList.join(separator))
+        : Bytes.fromString(vList.join(separator));
   }
 
   @override
@@ -166,18 +164,23 @@ abstract class Bytes extends ListBase<int>
   @override
   bool operator ==(Object other) {
     if (other is Bytes) {
-      if (length != other.length) return false;
-      for (var i = 0; i < length; i++) if (this[i] != other[i]) return false;
+      final len = buf.length;
+      if (len != other.buf.length) return false;
+      print('buf0 $buf');
+      print('buf1 ${other.buf}');
+      for (var i = 0; i < len; i++) {
+        if (buf[i] != other.buf[i])
+          return false;
+      }
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   @override
   int get hashCode {
     var hashCode = 0;
-    for (var i = 0; i < buf.length; i++) hashCode += buf[i] + i;
+    for (var i = 0; i < buf.length; i++) hashCode += buf[i] % 17;
     return hashCode;
   }
 
@@ -206,6 +209,7 @@ abstract class Bytes extends ListBase<int>
   }
 
   /// Returns a [String] indicating the endianness of _this_.
+  @override
   String get endianness => (endian == Endian.little) ? 'LE' : 'BE';
 
   // **** Getters that have no Endianness
@@ -311,7 +315,8 @@ abstract class Bytes extends ListBase<int>
   void setBytes(int start, Bytes bytes, [int offset = 0, int length]) {
     length ?? bytes.length;
     _checkRange(offset, length);
-    for (var i = start, j = offset; i < length; i++, j++) buf[i] = bytes[j];
+    final buf1 = bytes.buf;
+    for (var i = start, j = offset; i < length; i++, j++) buf[i] = buf1[j];
   }
 
   /// Sets the bytes at [offset] in _this_ to the bytes in [bd] from
@@ -420,9 +425,9 @@ abstract class Bytes extends ListBase<int>
     }
 
     if (len >= kDefaultLimit) throw const OutOfMemoryError();
-    final newBD = Uint8List(len);
-    for (var i = 0; i < buf.lengthInBytes; i++) newBD[i] = buf[i];
-    buf = newBD;
+    final newBuf = Uint8List(len);
+    for (var i = 0; i < buf.lengthInBytes; i++) newBuf[i] = buf[i];
+    buf = newBuf;
     _bd = buf.buffer.asByteData();
     return true;
   }

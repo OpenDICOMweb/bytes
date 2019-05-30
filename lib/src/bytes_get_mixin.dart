@@ -14,6 +14,7 @@ mixin BytesGetMixin {
   Uint8List get buf;
   ByteData get bd;
   Endian get endian;
+  String get endianness;
 
   int getInt16(int i);
   int getInt32(int i);
@@ -98,8 +99,11 @@ mixin BytesGetMixin {
   Float32List getFloat32List([int offset = 0, int length]) {
     length ??= _length32(offset);
     final list = Float32List(length);
-    for (var i = 0, j = offset; i < length; i++, j += 4)
-      list[i] = getFloat32(j);
+    for (var i = 0, j = offset; i < length; i++, j += 4) {
+      final x = getFloat32(j);
+      if (x.isNaN) print('i = $i j =$j x = $x');
+      list[i] = x;
+    }
     return list;
   }
 
@@ -214,13 +218,20 @@ mixin BytesGetMixin {
         : getUint64List(offset, length);
   }
 
+  String getEndian(Endian endian) =>
+    endian == Endian.little ? 'LE' : 'BE';
+
+  final _host = Endian.host;
+
   /// If [offset] is aligned on an 8-byte boundary, returns a [Float32List]
   /// view of the specified region; otherwise, creates a [Float32List] that
   /// is a copy of the specified region and returns it.
   Float32List asFloat32List([int offset = 0, int length]) {
     length ??= _length32(offset);
     final index = _absIndex(offset);
-    return (_isAligned32(index))
+//    print('host   ${getEndian(Endian.host)}');
+//    print('endian ${getEndian(endian)}');
+    return (_isAligned32(index) && endian == _host)
         ? buf.buffer.asFloat32List(index, length)
         : getFloat32List(offset, length);
   }

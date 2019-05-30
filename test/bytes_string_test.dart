@@ -7,14 +7,12 @@
 //  See the AUTHORS file for other contributors.
 //
 import 'dart:convert' as cvt;
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:bytes/bytes.dart';
-import 'package:bytes/src/constants.dart';
 import 'package:rng/rng.dart';
 import 'package:test/test.dart';
-import 'package:test_tools/tools.dart';
+
 
 void main() {
   final rng = RNG();
@@ -25,12 +23,11 @@ void main() {
   group('Bytes.fromAscii Utf8', () {
     test('ASCII String tests', () {
       for (var i = 0; i < repetitions; i++) {
-        final vList0 = rng.asciiList();
+        final vList0 = rng.asciiList(min, max);
         print('vList0 $vList0');
         final s0 = vList0.join('\\');
 
         final bytes0 = Bytes.fromString(s0);
-        final buf0 = bytes0.buf;
         expect(s0.length == bytes0.length, true);
         expect(bytes0.endian == Endian.little, true);
 
@@ -57,14 +54,13 @@ void main() {
 
     test('Latin String tests', () {
       for (var i = 0; i < repetitions; i++) {
-        final vList0 = rng.latinList();
+        final vList0 = rng.latinList(min, max);
         print('vList0 $vList0');
         final s0 = vList0.join('\\');
         print('s0.length ${s0.length}');
 
         final bytes0 = Bytes.fromString(s0);
         print('bytes0.length ${bytes0.length}');
-        final buf0 = bytes0.buf;
         expect(s0.length <= bytes0.length, true);
         expect(bytes0.endian == Endian.little, true);
 
@@ -93,7 +89,7 @@ void main() {
     /// DICOM UTF-8 Strings
     test('UTF8 String tests', () {
       for (var i = 0; i < repetitions; i++) {
-        final u8List = rng.utf8Bytes();
+        final u8List = rng.utf8Bytes(min, max);
         print('u8List.length ${u8List.length}');
         final s0 = cvt.utf8.decode(u8List, allowMalformed: true);
         print('s0.length ${s0.length}');

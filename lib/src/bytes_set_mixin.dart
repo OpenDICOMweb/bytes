@@ -30,10 +30,9 @@ mixin BytesSetMixin {
 
   // **** End of Interface
 
-
   // **** Int set methods
 
- int setInt16List(int start, List<int> list, [int offset = 0, int length]) {
+  int setInt16List(int start, List<int> list, [int offset = 0, int length]) {
     length ??= list.length;
     _checkLength(offset, length, kInt16Size);
     for (var i = offset, j = start; i < length; i++, j += 2)
@@ -51,11 +50,10 @@ mixin BytesSetMixin {
 
   void setInt32x4(int offset, Int32x4 value) {
     var i = offset;
-    bd
-      ..setInt32(i, value.w, Endian.little)
-      ..setInt32(i += 4, value.x)
-      ..setInt32(i += 4, value.y)
-      ..setInt32(i += 4, value.z);
+    setInt32(i, value.w);
+    setInt32(i += 4, value.x);
+    setInt32(i += 4, value.y);
+    setInt32(i += 4, value.z);
   }
 
   /// Creates an [Int32x4List] copy of the specified region of _this_.
@@ -151,7 +149,6 @@ mixin BytesSetMixin {
       setFloat64x2(j, list[i]);
     return length * 16;
   }
-
 
   // **** Internals
 

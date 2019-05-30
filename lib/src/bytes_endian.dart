@@ -88,10 +88,6 @@ class BytesLittleEndian extends Bytes
           ? Bytes.kEmptyBytes
           : Bytes.fromString(vList.join(separator));
 
-  /// Returns a [String] indicating the endianness of _this_.
-  @override
-  String get endianness => 'LE';
-
   /// The canonical empty (zero length) [Bytes] object.
   static final BytesLittleEndian kEmptyBytes = BytesLittleEndian.empty(0);
 }
@@ -126,18 +122,16 @@ class BytesBigEndian extends Bytes with BigEndianGetMixin, BigEndianSetMixin {
   /// [endian] defaults to [Endian.little].
   BytesBigEndian.typedDataView(TypedData td,
       [int offset = 0, int lengthInBytes])
-      : super(td.buffer.asUint8List(
-            td.offsetInBytes + offset, lengthInBytes ?? td.lengthInBytes));
+      : super((td is Uint8List)
+            ? td
+            : td.buffer.asUint8List(
+                td.offsetInBytes + offset, lengthInBytes ?? td.lengthInBytes));
 
   /// Creates a new [Bytes] from a [List<int>].  [endian] defaults
   /// to [Endian.little]. Any values in [list] that are larger than 8-bits
   /// are truncated.
   BytesBigEndian.fromList(List<int> list)
       : super((list is Uint8List) ? list : Uint8List.fromList(list));
-
-  /// Returns a [String] indicating the endianness of _this_.
-  @override
-  String get endianness => 'BE';
 
   /// The canonical empty (zero length) [Bytes] object.
   static final BytesBigEndian kEmptyBytes = BytesBigEndian.empty(0);

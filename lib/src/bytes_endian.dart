@@ -6,7 +6,6 @@
 //  Primary Author: Jim Philbin <jfphilbin@gmail.edu>
 //  See the AUTHORS file for other contributors.
 //
-import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
 import 'package:bytes/src/bytes.dart';
@@ -55,48 +54,12 @@ class BytesLittleEndian extends Bytes
   /// are truncated.
   BytesLittleEndian.fromList(List<int> list)
       : super((list is Uint8List) ? list : Uint8List.fromList(list));
-
-  /// Returns a [Bytes] containing the Base64 decoding of [s].
-  factory BytesLittleEndian.fromBase64(String s,
-      {bool padToEvenLength = false}) {
-    if (s.isEmpty) return Bytes.kEmptyBytes;
-    var bList = cvt.base64.decode(s);
-    final bLength = bList.length;
-    if (padToEvenLength == true && bLength.isOdd) {
-      // Performance: It would be good to ignore this copy
-      final nList = Uint8List(bLength + 1);
-      for (var i = 0; i < bLength - 1; i++) nList[i] = bList[i];
-      nList[bLength] = 0;
-      bList = nList;
-    }
-    return BytesLittleEndian.typedDataView(bList);
-  }
-
-  /// Returns [Bytes] containing a UTF8 encoding of [s];
-  factory BytesLittleEndian.fromString(String s) {
-    if (s == null) return null;
-    if (s.isEmpty) return Bytes.kEmptyBytes;
-    final Uint8List list = cvt.utf8.encode(s);
-    return BytesLittleEndian.typedDataView(list);
-  }
-
-  /// Returns a [Bytes] containing UTF-8 encoding of the concatination of
-  /// the [String]s in [vList].
-  factory BytesLittleEndian.fromStringList(List<String> vList,
-          [String separator = '\\']) =>
-      (vList.isEmpty)
-          ? Bytes.kEmptyBytes
-          : Bytes.fromString(vList.join(separator));
-
-  /// The canonical empty (zero length) [Bytes] object.
-  static final BytesLittleEndian kEmptyBytes = BytesLittleEndian.empty(0);
 }
 
 /// [BytesBigEndian] is a class that implements a Big Endian byte array
 /// that supports both [Uint8List] and [ByteData] interfaces.
 class BytesBigEndian extends Bytes with BigEndianGetMixin, BigEndianSetMixin {
-  @override
-  Uint8List get buf;
+
 
   /// Creates a new [BytesBigEndian] from [buf].
   BytesBigEndian(Uint8List buf) : super(buf);
@@ -132,9 +95,6 @@ class BytesBigEndian extends Bytes with BigEndianGetMixin, BigEndianSetMixin {
   /// are truncated.
   BytesBigEndian.fromList(List<int> list)
       : super((list is Uint8List) ? list : Uint8List.fromList(list));
-
-  /// The canonical empty (zero length) [Bytes] object.
-  static final BytesBigEndian kEmptyBytes = BytesBigEndian.empty(0);
 }
 
 //TODO: move this to the appropriate place

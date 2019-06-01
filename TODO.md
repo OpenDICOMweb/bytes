@@ -4,13 +4,13 @@
 
 1. Make existing debug work
 1. Make existing test work
+4. Document all public methods,...
 
 ## Current
 
 1. make all test look like bytes_float32_test
 1. Add test for all get/set methods little-endian and big-endian
 1. Add test for String methods
-4. Document all public methods,...
 5. Test and record performance
 1. Finish README.md
 

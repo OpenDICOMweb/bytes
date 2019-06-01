@@ -140,6 +140,7 @@ abstract class Bytes extends ListBase<int>
     return Bytes.typedDataView(bList);
   }
 
+/*
   /// Returns [Bytes] containing a UTF8 encoding of [s];
   factory Bytes.fromString(String s) {
     if (s == null) return null;
@@ -157,6 +158,7 @@ abstract class Bytes extends ListBase<int>
         ? Bytes.fromString(vList.join(separator))
         : Bytes.fromString(vList.join(separator));
   }
+*/
 
   @override
   int operator [](int i) => buf[i];
@@ -166,8 +168,8 @@ abstract class Bytes extends ListBase<int>
     if (other is Bytes) {
       final len = buf.length;
       if (len != other.buf.length) return false;
-      print('buf0 $buf');
-      print('buf1 ${other.buf}');
+//      print('buf0 $buf');
+//      print('buf1 ${other.buf}');
       for (var i = 0; i < len; i++) {
         if (buf[i] != other.buf[i])
           return false;
@@ -277,16 +279,6 @@ abstract class Bytes extends ListBase<int>
 
   // **** Get Strings and List<String>
 
-  /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
-  String getString({int offset = 0, int length, bool allowInvalid = true}) =>
-      getUtf8(offset: offset, length: length, allowInvalid: allowInvalid);
-
-  /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
-  /// Also, allows the removal of padding characters.
-  String getUtf8({int offset = 0, int length, bool allowInvalid = true}) =>
-      cvt.utf8.decode(asUint8List(offset, length ?? this.length),
-          allowMalformed: allowInvalid);
-
   /// Returns a [String] containing a _ASCII_ decoding of the specified
   /// region of _this_. Also allows the removal of a padding character.
   String getAscii({int offset = 0, int length, bool allowInvalid = true}) =>
@@ -303,6 +295,19 @@ abstract class Bytes extends ListBase<int>
   /// region of _this_. Also allows the removal of a padding character.
   String getBase64([int offset = 0, int length]) =>
       cvt.base64.encode(asUint8List(offset, length ?? this.length));
+
+  /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
+  /// Also, allows the removal of padding characters.
+  String getUtf8({int offset = 0, int length, bool allowInvalid = true}) {
+    final s = cvt.utf8.decode(asUint8List(offset, length ?? this.length),
+        allowMalformed: allowInvalid);
+    print('getUtf8 "$s"');
+    return s;
+  }
+
+  /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
+  String getString({int offset = 0, int length, bool allowInvalid = true}) =>
+      getUtf8(offset: offset, length: length, allowInvalid: allowInvalid);
 
   // **** Setters that have no Endianness
 
@@ -354,11 +359,14 @@ abstract class Bytes extends ListBase<int>
 
   // **** String Setters
 
+  // TODO fix to use Latin
   /// UTF-8 encodes the specified range of [s] and then writes the
   /// code units to _this_ starting at [start]. Returns the offset
   /// of the last byte + 1.
+  ///
+  /// Note: Currently only encodes Latin1.
   void setString(int start, String s, [int offset = 0, int length]) =>
-      setUtf8(start, s);
+      setLatin(start, s);
 
   // TODO: unit test
   /// UTF-8 encodes the specified range of [s] and then writes the

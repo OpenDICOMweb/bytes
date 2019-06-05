@@ -8,10 +8,10 @@
 //
 import 'dart:typed_data';
 
-import 'package:bytes/src/bytes.dart';
+import 'package:bytes/src/bytes/bytes.dart';
 import 'package:bytes/src/constants.dart';
-import 'package:bytes/src/bytes_endian_get_mixins.dart';
-import 'package:bytes/src/bytes_endian_set_mixins.dart';
+import 'package:bytes/src/bytes/bytes_endian_get_mixins.dart';
+import 'package:bytes/src/bytes/bytes_endian_set_mixins.dart';
 
 /// Bytes Package Overview
 ///

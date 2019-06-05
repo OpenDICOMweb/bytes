@@ -99,11 +99,8 @@ mixin BytesGetMixin {
   Float32List getFloat32List([int offset = 0, int length]) {
     length ??= _length32(offset);
     final list = Float32List(length);
-    for (var i = 0, j = offset; i < length; i++, j += 4) {
-      final x = getFloat32(j);
-      if (x.isNaN) print('i = $i j =$j x = $x');
-      list[i] = x;
-    }
+    for (var i = 0, j = offset; i < length; i++, j += 4)
+      list[i] = getFloat32(j);
     return list;
   }
 
@@ -218,8 +215,7 @@ mixin BytesGetMixin {
         : getUint64List(offset, length);
   }
 
-  String getEndian(Endian endian) =>
-    endian == Endian.little ? 'LE' : 'BE';
+  String getEndian(Endian endian) => endian == Endian.little ? 'LE' : 'BE';
 
   final _host = Endian.host;
 
@@ -229,8 +225,6 @@ mixin BytesGetMixin {
   Float32List asFloat32List([int offset = 0, int length]) {
     length ??= _length32(offset);
     final index = _absIndex(offset);
-//    print('host   ${getEndian(Endian.host)}');
-//    print('endian ${getEndian(endian)}');
     return (_isAligned32(index) && endian == _host)
         ? buf.buffer.asFloat32List(index, length)
         : getFloat32List(offset, length);

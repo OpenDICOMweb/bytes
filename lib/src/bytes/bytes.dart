@@ -10,9 +10,9 @@ import 'dart:collection';
 import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
-import 'package:bytes/src/bytes_endian.dart';
-import 'package:bytes/src/bytes_get_mixin.dart';
-import 'package:bytes/src/bytes_set_mixin.dart';
+import 'package:bytes/src/bytes/bytes_endian.dart';
+import 'package:bytes/src/bytes/bytes_get_mixin.dart';
+import 'package:bytes/src/bytes/bytes_set_mixin.dart';
 import 'package:bytes/src/constants.dart';
 
 /// The length at which _ensureLength_ switches from doubling the
@@ -33,49 +33,6 @@ int largeChunkIncrement = 4 * k1MB;
 abstract class Bytes extends ListBase<int>
     with BytesGetMixin, BytesSetMixin
     implements Comparable<Bytes> {
-  // **** Interface
-  // Urgent decide if this interface is needed
-/*
-  @override
-  int getInt16(int i);
-  @override
-  int getInt32(int i);
-  @override
-  int getInt64(int i);
-
-  @override
-  int getUint16(int i);
-  @override
-  int getUint32(int i);
-  @override
-  int getUint64(int i);
-
-  @override
-  double getFloat32(int i);
-  @override
-  double getFloat64(int i);
-
-  @override
-  void setInt16(int i, int v);
-  @override
-  void setInt32(int i, int v);
-  @override
-  void setInt64(int i, int v);
-
-  @override
-  void setUint16(int i, int v);
-  @override
-  void setUint32(int i, int v);
-  @override
-  void setUint64(int i, int v);
-
-  @override
-  void setFloat32(int i, double v);
-  @override
-  void setFloat64(int i, double v);
-*/
-
-  // **** End interface
   @override
   Uint8List buf;
   ByteData _bd;
@@ -125,6 +82,22 @@ abstract class Bytes extends ListBase<int>
           : BytesBigEndian.fromList(list);
 
   // Urgent move to DicomBytes
+  /// Returns a [Bytes] containing the Utf8 decoding of [s].
+  factory Bytes.fromString(String s, {bool padToEvenLength = false}) {
+    if (s.isEmpty) return kEmptyBytes;
+    Uint8List bList = cvt.utf8.encode(s);
+    final bLength = bList.length;
+    if (padToEvenLength == true && bLength.isOdd) {
+      // Performance: It would be good to ignore this copy
+      final nList = Uint8List(bLength + 1);
+      for (var i = 0; i < bLength - 1; i++) nList[i] = bList[i];
+      nList[bLength] = 0;
+      bList = nList;
+    }
+    return Bytes.typedDataView(bList);
+  }
+
+  // Urgent move to DicomBytes
   /// Returns a [Bytes] containing the Base64 decoding of [s].
   factory Bytes.fromBase64(String s, {bool padToEvenLength = false}) {
     if (s.isEmpty) return kEmptyBytes;
@@ -168,12 +141,7 @@ abstract class Bytes extends ListBase<int>
     if (other is Bytes) {
       final len = buf.length;
       if (len != other.buf.length) return false;
-//      print('buf0 $buf');
-//      print('buf1 ${other.buf}');
-      for (var i = 0; i < len; i++) {
-        if (buf[i] != other.buf[i])
-          return false;
-      }
+      for (var i = 0; i < len; i++) if (buf[i] != other.buf[i]) return false;
       return true;
     }
     return false;
@@ -301,7 +269,6 @@ abstract class Bytes extends ListBase<int>
   String getUtf8({int offset = 0, int length, bool allowInvalid = true}) {
     final s = cvt.utf8.decode(asUint8List(offset, length ?? this.length),
         allowMalformed: allowInvalid);
-    print('getUtf8 "$s"');
     return s;
   }
 

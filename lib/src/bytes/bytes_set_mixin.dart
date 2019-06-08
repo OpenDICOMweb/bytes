@@ -8,27 +8,15 @@
 //
 import 'dart:typed_data';
 
+import 'package:bytes/bytes.dart';
 import 'package:bytes/src/constants.dart';
 
 /// [BytesSetMixin] is a class that provides a read-only byte array that
 /// supports both [Uint8List] and [ByteData] interfaces.
-mixin BytesSetMixin {
+mixin BytesSetMixin implements EndianSetters {
   Uint8List get buf;
   ByteData get bd;
   Endian get endian;
-
-  void setInt16(int i, int v);
-  void setInt32(int i, int v);
-  void setInt64(int i, int v);
-
-  void setUint16(int i, int v);
-  void setUint32(int i, int v);
-  void setUint64(int i, int v);
-
-  void setFloat32(int i, double v);
-  void setFloat64(int i, double v);
-
-  // **** End of Interface
 
   // **** Int set methods
 
@@ -48,13 +36,6 @@ mixin BytesSetMixin {
     return length * 4;
   }
 
-  void setInt32x4(int offset, Int32x4 value) {
-    var i = offset;
-    setInt32(i, value.w);
-    setInt32(i += 4, value.x);
-    setInt32(i += 4, value.y);
-    setInt32(i += 4, value.z);
-  }
 
   /// Creates an [Int32x4List] copy of the specified region of _this_.
   int setInt32x4List(int start, List<Int32x4> list,
@@ -109,14 +90,6 @@ mixin BytesSetMixin {
     return length * 4;
   }
 
-  void setFloat32x4(int index, Float32x4 v) {
-    var i = index;
-    setFloat32(i, v.w);
-    setFloat32(i += 4, v.x);
-    setFloat32(i += 4, v.y);
-    setFloat32(i += 4, v.z);
-  }
-
   int setFloat32x4List(int start, Float32x4List list,
       [int offset = 0, int length]) {
     length ??= list.length;
@@ -133,12 +106,6 @@ mixin BytesSetMixin {
     for (var i = offset, j = start; i < length; i++, j += 8)
       setFloat64(j, list[i]);
     return length * 8;
-  }
-
-  void setFloat64x2(int index, Float64x2 v) {
-    var i = index;
-    setFloat64(i, v.x);
-    setFloat64(i += 4, v.y);
   }
 
   int setFloat64x2List(int start, Float64x2List list,

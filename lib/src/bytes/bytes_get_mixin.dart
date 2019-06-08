@@ -16,16 +16,20 @@ mixin BytesGetMixin {
   Endian get endian;
   String get endianness;
 
-  int getInt16(int i);
-  int getInt32(int i);
-  int getInt64(int i);
+  int getInt16(int offset);
+  int getInt32(int offset);
+  Int32x4 getInt32x4(int offset);
+  int getInt64(int offset);
 
-  int getUint16(int i);
-  int getUint32(int i);
-  int getUint64(int i);
+  int getUint16(int offset);
+  int getUint32(int offset);
+  int getUint64(int offset);
 
-  double getFloat32(int i);
-  double getFloat64(int i);
+  double getFloat32(int offset);
+  Float32x4 getFloat32x4(int offset);
+
+  double getFloat64(int offset);
+  Float64x2 getFloat64x2(int offset);
 
   // **** End of Interface
 
@@ -46,9 +50,6 @@ mixin BytesGetMixin {
     for (var i = 0, j = offset; i < length; i++, j += 4) list[i] = getInt32(j);
     return list;
   }
-
-  Int32x4 getInt32x4(int offset) => Int32x4(getInt32(offset),
-      getInt32(offset + 4), getInt32(offset + 8), getInt32(offset + 12));
 
   /// Creates an [Int32x4List] copy of the specified region of _this_.
   Int32x4List getInt32x4List([int offset = 0, int length]) {
@@ -104,9 +105,6 @@ mixin BytesGetMixin {
     return list;
   }
 
-  Float32x4 getFloat32x4(int offset) => Float32x4(getFloat32(offset),
-      getFloat32(offset + 4), getFloat32(offset + 8), getFloat32(offset + 12));
-
   /// Creates an [Float32x4List] copy of the specified region of _this_.
   Float32x4List getFloat32x4List([int offset = 0, int length]) {
     length ??= _length128(offset);
@@ -124,9 +122,6 @@ mixin BytesGetMixin {
       list[i] = getFloat64(j);
     return list;
   }
-
-  Float64x2 getFloat64x2(int offset) =>
-      Float64x2(getFloat64(offset), getFloat64(offset + 8));
 
   /// Creates an [Float64x2List] copy of the specified region of _this_.
   Float64x2List getFloat64x2List([int offset = 0, int length]) {

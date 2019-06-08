@@ -164,8 +164,8 @@ void main() {
         expect(bytes0.endian == Endian.little, isTrue);
 
         final s1 = bytes0.getLatin();
-        print('s0 "$s0"');
-        print('s1 "$s1"');
+ //       print('s0 "$s0"');
+ //       print('s1 "$s1"');
         expect(s0 == s1, isTrue);
         final vList1 = sSplit(s1);
         isValidUtf8List(vList1);

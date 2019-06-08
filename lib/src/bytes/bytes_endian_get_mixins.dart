@@ -7,6 +7,7 @@
 //
 import 'dart:typed_data';
 
+// Issue: add alignment and length check
 mixin LittleEndianGetMixin {
   Uint8List get buf;
   ByteData get bd;
@@ -16,48 +17,44 @@ mixin LittleEndianGetMixin {
   /// Returns a [String] indicating the endianness of _this_.
   String get endianness => 'LE';
 
-  int getInt16(int i) => bd.getInt16(i, Endian.little);
-  int getInt32(int i) => bd.getInt32(i, Endian.little);
-  int getInt64(int i) => bd.getInt64(i, Endian.little);
+  int getInt16(int i) => bd.getInt16(_check(i, 2), Endian.little);
+  int getInt32(int i) => bd.getInt32(_check(i, 4), Endian.little);
+  int getInt64(int i) => bd.getInt64(_check(i, 8), Endian.little);
+
+  int getUint16(int i) => bd.getUint16(_check(i, 2), Endian.little);
+  int getUint32(int i) => bd.getUint32(_check(i, 4), Endian.little);
+  int getUint64(int i) => bd.getUint64(_check(i, 8), Endian.little);
+
+  double getFloat32(int i) => bd.getFloat32(_check(i, 4), Endian.little);
+  double getFloat64(int i) => bd.getFloat64(_check(i, 8), Endian.little);
 
   Int32x4 getInt32x4(int offset) {
-    _checkRange(offset, 16);
-    var i = offset;
+    var i = __check(offset, 16, bd);
     final w = bd.getInt32(i, Endian.little);
-    final x = bd.getInt32(i += 4, Endian.little);
-    final y = bd.getInt32(i += 4, Endian.little);
-    final z = bd.getInt32(i += 4, Endian.little);
+    final x = bd.getInt32(i + 4, Endian.little);
+    final y = bd.getInt32(i + 8, Endian.little);
+    final z = bd.getInt32(i + 12, Endian.little);
     return Int32x4(w, x, y, z);
   }
 
-  int getUint16(int i) => bd.getUint16(i, Endian.little);
-  int getUint32(int i) => bd.getUint32(i, Endian.little);
-  int getUint64(int i) => bd.getUint64(i, Endian.little);
-
-  double getFloat32(int i) => bd.getFloat32(i, Endian.little);
-
-  Float32x4 getFloat32x4(int index) {
-    _checkRange(index, 16);
-    var i = index;
+  Float32x4 getFloat32x4(int offset) {
+    var i = _check(offset, 16);
     final w = bd.getFloat32(i, Endian.little);
-    final x = bd.getFloat32(i += 4, Endian.little);
-    final y = bd.getFloat32(i += 4, Endian.little);
-    final z = bd.getFloat32(i += 4, Endian.little);
+    final x = bd.getFloat32(i + 4, Endian.little);
+    final y = bd.getFloat32(i + 8, Endian.little);
+    final z = bd.getFloat32(i + 12, Endian.little);
     return Float32x4(w, x, y, z);
   }
 
-  double getFloat64(int i) => bd.getFloat64(i, Endian.little);
 
-  Float64x2 getFloat64x2(int index) {
-    _checkRange(index, 16);
-    var i = index;
+  Float64x2 getFloat64x2(int offset) {
+    var i = _check(offset, 16);
     final x = bd.getFloat64(i, Endian.little);
-    final y = bd.getFloat64(i += 8, Endian.little);
+    final y = bd.getFloat64(i + 8, Endian.little);
     return Float64x2(x, y);
   }
 
-  void _checkRange(int offset, int sizeInBytes) =>
-      __checkRange(offset, sizeInBytes, buf);
+  int _check(int offset, int size) => __check(offset, size, bd);
 }
 
 mixin BigEndianGetMixin {
@@ -69,53 +66,63 @@ mixin BigEndianGetMixin {
   /// Returns a [String] indicating the endianness of _this_.
   String get endianness => 'BE';
 
-
-  int getInt16(int i) => bd.getInt16(i, Endian.big);
-  int getInt32(int i) => bd.getInt32(i, Endian.big);
-  int getInt64(int i) => bd.getInt64(i, Endian.big);
+  int getInt16(int i) => bd.getInt16(_check(i, 2), Endian.big);
+  int getInt32(int i) => bd.getInt32(_check(i, 4), Endian.big);
+  int getInt64(int i) => bd.getInt64(_check(i, 8), Endian.big);
 
   Int32x4 getInt32x4(int offset) {
-    _checkRange(offset, 16);
-    var i = offset;
+    var i = _check(offset, 16);
     final w = bd.getInt32(i, Endian.big);
-    final x = bd.getInt32(i += 4, Endian.big);
-    final y = bd.getInt32(i += 4, Endian.big);
-    final z = bd.getInt32(i += 4, Endian.big);
+    final x = bd.getInt32(i + 4, Endian.big);
+    final y = bd.getInt32(i + 8, Endian.big);
+    final z = bd.getInt32(i + 12, Endian.big);
     return Int32x4(w, x, y, z);
   }
 
-  int getUint16(int i) => bd.getUint16(i, Endian.big);
-  int getUint32(int i) => bd.getUint32(i, Endian.big);
-  int getUint64(int i) => bd.getUint64(i, Endian.big);
+  int getUint16(int i) => bd.getUint16(_check(i, 2), Endian.big);
+  int getUint32(int i) => bd.getUint32(_check(i, 4), Endian.big);
+  int getUint64(int i) => bd.getUint64(_check(i, 8), Endian.big);
 
-  double getFloat32(int i) => bd.getFloat32(i, Endian.big);
+  double getFloat32(int i) => bd.getFloat32(_check(i, 4), Endian.big);
 
-  Float32x4 getFloat32x4(int index) {
-    _checkRange(index, 16);
-    var i = index;
+  Float32x4 getFloat32x4(int offset) {
+    var i = _check(offset, 16);
     final w = bd.getFloat32(i, Endian.big);
-    final x = bd.getFloat32(i += 4, Endian.big);
-    final y = bd.getFloat32(i += 4, Endian.big);
-    final z = bd.getFloat32(i += 4, Endian.big);
+    final x = bd.getFloat32(i + 4, Endian.big);
+    final y = bd.getFloat32(i + 8, Endian.big);
+    final z = bd.getFloat32(i + 12, Endian.big);
     return Float32x4(w, x, y, z);
   }
 
-  double getFloat64(int i) => bd.getFloat64(i, Endian.big);
+  double getFloat64(int i) => bd.getFloat64(_check(i, 8), Endian.big);
 
-  Float64x2 getFloat64x2(int index) {
-    _checkRange(index, 16);
-    var i = index;
+  Float64x2 getFloat64x2(int offset) {
+    var i = _check(offset, 16);
     final x = bd.getFloat64(i, Endian.big);
-    final y = bd.getFloat64(i += 8, Endian.big);
+    final y = bd.getFloat64(i + 8, Endian.big);
     return Float64x2(x, y);
   }
 
-  void _checkRange(int offset, int sizeInBytes) =>
-      __checkRange(offset, sizeInBytes, buf);
+  int _check(int offset, int size) => __check(offset, size, bd);
 }
 
-void __checkRange(int offset, int sizeInBytes, Uint8List buf) {
-  final length = offset + sizeInBytes;
-  if (length > buf.length)
-    throw RangeError('$length is larger then bytes remaining $buf.length');
+int __check(int offset, int size, ByteData bd) {
+  var start = bd.offsetInBytes + offset;
+  var remaining = bd.lengthInBytes - start;
+  if (size > remaining)
+    throw ArgumentError('$size is greater than $remaining remaining int $bd');
+  return offset;
 }
+
+/* Urgent remove
+/// Utility for debugging
+void printIt(int offset, int size, ByteData bd) {
+  var s = '''
+         offset $offset
+           size $size
+offset in bytes ${bd.offsetInBytes}
+  size in bytes ${bd.lengthInBytes}
+  ''';
+  print(s);
+}
+*/

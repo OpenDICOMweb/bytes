@@ -18,11 +18,12 @@ void main() {
   group('Bytes Float64 Tests', () {
     test('Basic Float64 tests', () {
       final vList0 = rng.float64List(5, 10);
-      // log.debug('vList0: $vList0');
       final bytes0 = Bytes.typedDataView(vList0);
+//      printIt(0, vList0.length * 8, bytes0.bd);
       final vList1 = bytes0.asFloat64List();
       // log.debug('vList1: $vList1');
       expect(vList1, equals(vList0));
+//      printIt(0, vList0.length * 8, bytes0.bd);
       final vList2 = bytes0.getFloat64List();
       // log.debug('vList2: $vList2');
       expect(vList2, equals(vList1));

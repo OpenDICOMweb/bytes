@@ -83,7 +83,8 @@ class Bytes extends ListBase<int>
     if (padToEvenLength == true && bLength.isOdd) {
       // Performance: It would be good to ignore this copy
       final nList = Uint8List(bLength + 1);
-      for (var i = 0; i < bLength - 1; i++) nList[i] = bList[i];
+      for (var i = 0; i < bLength - 1; i++)
+        nList[i] = bList[i];
       nList[bLength] = 0;
       bList = nList;
     }
@@ -115,7 +116,8 @@ class Bytes extends ListBase<int>
   bool operator ==(Object other) {
     if (other is Bytes) {
       if (length != other.length) return false;
-      for (var i = 0; i < length; i++) if (this[i] != other[i]) return false;
+      for (var i = 0; i < length; i++)
+        if (this[i] != other[i]) return false;
       return true;
     } else {
       return false;
@@ -125,7 +127,8 @@ class Bytes extends ListBase<int>
   @override
   int get hashCode {
     var hashCode = 0;
-    for (var i = 0; i < buf.length; i++) hashCode += buf[i] + i;
+    for (var i = 0; i < buf.length; i++)
+      hashCode += buf[i] + i;
     return hashCode;
   }
 
@@ -191,21 +194,22 @@ class Bytes extends ListBase<int>
   bool ensureLength(int length) {
     assert(length > 0);
     var len = buf.lengthInBytes;
-    if (length <= len) return false;
-
-    if (len == 0) {
-      len = 1;
+    if (len >= length) {
+      return false;
     } else {
-      while (len < length)
+      if (len == 0) len = 1;
+      do {
         len = (len < doublingLimit) ? len * 2 : len + largeChunkIncrement;
-    }
+      } while (len < length);
 
-    if (len >= kDefaultLimit) throw const OutOfMemoryError();
-    final newBD = Uint8List(len);
-    for (var i = 0; i < buf.lengthInBytes; i++) newBD[i] = buf[i];
-    buf = newBD;
-    _bd = buf.buffer.asByteData();
-    return true;
+      if (len >= kDefaultLimit) throw const OutOfMemoryError();
+      final newBD = Uint8List(len);
+      for (var i = 0; i < buf.lengthInBytes; i++)
+        newBD[i] = buf[i];
+      buf = newBD;
+      _bd = buf.buffer.asByteData();
+      return true;
+    }
   }
 
   @override

@@ -132,13 +132,17 @@ mixin BytesGetMixin {
     return list;
   }
 
+  String getEndian(Endian endian) => endian == Endian.little ? 'LE' : 'BE';
+
+  final _host = Endian.host;
+
   /// If [offset] is aligned on an 8-byte boundary, returns a [Int16List]
   /// view of the specified region; otherwise, creates a [Int16List] that
   /// is a copy of the specified region and returns it.
   Int16List asInt16List([int offset = 0, int length]) {
     final index = _absIndex(offset);
     length ??= _length16(offset);
-    return (_isAligned16(index))
+    return (_isAligned16(index) && endian == _host)
         ? buf.buffer.asInt16List(index, length)
         : getInt16List(offset, length);
   }
@@ -149,7 +153,7 @@ mixin BytesGetMixin {
   Int32List asInt32List([int offset = 0, int length]) {
     final index = _absIndex(offset);
     length ??= _length32(offset);
-    return (_isAligned32(index))
+    return (_isAligned32(index) && endian == _host)
         ? buf.buffer.asInt32List(index, length)
         : getInt32List(offset, length);
   }
@@ -160,7 +164,7 @@ mixin BytesGetMixin {
   Int32x4List asInt32x4List([int offset = 0, int length]) {
     final index = _absIndex(offset);
     length ??= _length128(offset);
-    return (_isAligned128(index))
+    return (_isAligned128(index) && endian == _host)
         ? buf.buffer.asInt32x4List(index, length)
         : getInt32x4List(offset, length);
   }
@@ -171,7 +175,7 @@ mixin BytesGetMixin {
   Int64List asInt64List([int offset = 0, int length]) {
     final index = _absIndex(offset);
     length ??= _length64(offset);
-    return (_isAligned64(index))
+    return (_isAligned64(index) && endian == _host)
         ? buf.buffer.asInt64List(index, length)
         : getInt64List(offset, length);
   }
@@ -182,7 +186,7 @@ mixin BytesGetMixin {
   Uint16List asUint16List([int offset = 0, int length]) {
     length ??= _length16(offset);
     final index = _absIndex(offset);
-    return (_isAligned16(index))
+    return (_isAligned16(index) && endian == _host)
         ? buf.buffer.asUint16List(index, length)
         : getUint16List(offset, length);
   }
@@ -194,7 +198,7 @@ mixin BytesGetMixin {
     length ??= _length32(offset);
     if (length < 0) return null;
     final index = _absIndex(offset);
-    return (_isAligned32(index))
+    return (_isAligned32(index) && endian == _host)
         ? buf.buffer.asUint32List(index, length)
         : getUint32List(offset, length);
   }
@@ -205,14 +209,10 @@ mixin BytesGetMixin {
   Uint64List asUint64List([int offset = 0, int length]) {
     length ??= _length64(offset);
     final index = _absIndex(offset);
-    return (_isAligned64(index))
+    return (_isAligned64(index) && endian == _host)
         ? buf.buffer.asUint64List(index, length)
         : getUint64List(offset, length);
   }
-
-  String getEndian(Endian endian) => endian == Endian.little ? 'LE' : 'BE';
-
-  final _host = Endian.host;
 
   /// If [offset] is aligned on an 8-byte boundary, returns a [Float32List]
   /// view of the specified region; otherwise, creates a [Float32List] that
@@ -230,9 +230,9 @@ mixin BytesGetMixin {
   /// creates a [Float32x4List] that is a copy of the specified
   /// region and returns it.
   Float32x4List asFloat32x4List([int offset = 0, int length]) {
-    final index = _absIndex(offset);
     length ??= _length128(offset);
-    return (_isAligned128(index))
+    final index = _absIndex(offset);
+    return (_isAligned128(index) && endian == _host)
         ? buf.buffer.asFloat32x4List(index, length)
         : getFloat32x4List(offset, length);
   }
@@ -241,9 +241,9 @@ mixin BytesGetMixin {
   /// view of the specified region; otherwise, creates a [Float64List] that
   /// is a copy of the specified region and returns it.
   Float64List asFloat64List([int offset = 0, int length]) {
-    final index = _absIndex(offset);
     length ??= _length64(offset);
-    return (_isAligned64(index))
+    final index = _absIndex(offset);
+    return (_isAligned64(index) && endian == _host)
         ? buf.buffer.asFloat64List(index, length)
         : getFloat64List(offset, length);
   }
@@ -254,7 +254,7 @@ mixin BytesGetMixin {
   Float64x2List asFloat64x2List([int offset = 0, int length]) {
     final index = _absIndex(offset);
     length ??= _length128(offset);
-    return (_isAligned128(index))
+    return (_isAligned128(index) && endian == _host)
         ? buf.buffer.asFloat64x2List(index, length)
         : getFloat64x2List(offset, length);
   }

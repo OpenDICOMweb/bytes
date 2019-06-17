@@ -81,57 +81,12 @@ abstract class Bytes extends ListBase<int>
           ? BytesLittleEndian.fromList(list)
           : BytesBigEndian.fromList(list);
 
-  // Urgent move to DicomBytes
   /// Returns a [Bytes] containing the Utf8 decoding of [s].
-  factory Bytes.fromString(String s, {bool padToEvenLength = false}) {
-    if (s.isEmpty) return kEmptyBytes;
-    Uint8List bList = cvt.utf8.encode(s);
-    final bLength = bList.length;
-    if (padToEvenLength == true && bLength.isOdd) {
-      // Performance: It would be good to ignore this copy
-      final nList = Uint8List(bLength + 1);
-      for (var i = 0; i < bLength - 1; i++) nList[i] = bList[i];
-      nList[bLength] = 0;
-      bList = nList;
-    }
-    return Bytes.typedDataView(bList);
-  }
-
-  // Urgent move to DicomBytes
-  /// Returns a [Bytes] containing the Base64 decoding of [s].
-  factory Bytes.fromBase64(String s, {bool padToEvenLength = false}) {
-    if (s.isEmpty) return kEmptyBytes;
-    var bList = cvt.base64.decode(s);
-    final bLength = bList.length;
-    if (padToEvenLength == true && bLength.isOdd) {
-      // Performance: It would be good to ignore this copy
-      final nList = Uint8List(bLength + 1);
-      for (var i = 0; i < bLength - 1; i++) nList[i] = bList[i];
-      nList[bLength] = 0;
-      bList = nList;
-    }
-    return Bytes.typedDataView(bList);
-  }
-
-/*
-  /// Returns [Bytes] containing a UTF8 encoding of [s];
   factory Bytes.fromString(String s) {
-    if (s == null) return null;
     if (s.isEmpty) return kEmptyBytes;
-    final Uint8List list = cvt.utf8.encode(s);
-    return Bytes.typedDataView(list);
+    Uint8List list = cvt.utf8.encode(s);
+    return  Bytes.typedDataView(list);
   }
-
-  /// Returns a [Bytes] containing UTF-8 encoding of the concatination of
-  /// the [String]s in [vList].
-  factory Bytes.fromStringList(List<String> vList,
-      [String separator = '\\', Endian endian = Endian.little]) {
-    if (vList.isEmpty) return Bytes.kEmptyBytes;
-    return (endian == Endian.little)
-        ? Bytes.fromString(vList.join(separator))
-        : Bytes.fromString(vList.join(separator));
-  }
-*/
 
   @override
   int operator [](int i) => buf[i];
@@ -248,24 +203,23 @@ abstract class Bytes extends ListBase<int>
   // **** Get Strings and List<String>
 
   /// Returns a [String] containing a _ASCII_ decoding of the specified
-  /// region of _this_. Also allows the removal of a padding character.
+  /// region of _this_.
   String getAscii({int offset = 0, int length, bool allowInvalid = true}) =>
       cvt.ascii.decode(asUint8List(offset, length ?? this.length),
           allowInvalid: allowInvalid);
 
   /// Returns a [String] containing a _Latin_ decoding of the specified
-  /// region of _this_. Also allows the removal of a padding character.
+  /// region of _this_.
   String getLatin({int offset = 0, int length, bool allowInvalid = true}) =>
       cvt.latin1.decode(asUint8List(offset, length ?? this.length),
           allowInvalid: allowInvalid);
 
   /// Returns a [String] containing a _ASCII_ decoding of the specified
-  /// region of _this_. Also allows the removal of a padding character.
+  /// region of _this_.
   String getBase64([int offset = 0, int length]) =>
       cvt.base64.encode(asUint8List(offset, length ?? this.length));
 
   /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
-  /// Also, allows the removal of padding characters.
   String getUtf8({int offset = 0, int length, bool allowInvalid = true}) {
     final s = cvt.utf8.decode(asUint8List(offset, length ?? this.length),
         allowMalformed: allowInvalid);

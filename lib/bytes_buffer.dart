@@ -6,6 +6,7 @@
 //  Primary Author: Jim Philbin <jfphilbin@gmail.edu>
 //  See the AUTHORS file for other contributors.
 //
+export 'package:bytes/bytes.dart';
 export 'package:bytes/src/buffer/bytes_buffer.dart';
 export 'package:bytes/src/buffer/bytes_buffer_base.dart';
 export 'package:bytes/src/buffer/read_buffer.dart';

@@ -75,7 +75,8 @@ mixin LittleEndianSetMixin implements EndianSetters {
       ..setFloat64(i += 4, v.y, Endian.little);
   }
 
-  int _check(int offset, int size) => __check(offset, size, bd);
+// Urgent flush if not used
+//  int _check(int offset, int size) => __check(offset, size, bd);
 }
 
 mixin BigEndianSetMixin implements EndianSetters {
@@ -126,9 +127,11 @@ mixin BigEndianSetMixin implements EndianSetters {
     bd..setFloat64(i, v.x, Endian.big)..setFloat64(i += 4, v.y, Endian.big);
   }
 
-  int _check(int offset, int size) => __check(offset, size, bd);
+// Urgent
+//  int _check(int offset, int size) => __check(offset, size, bd);
 }
 
+/* Urgent
 int __check(int offset, int size, ByteData bd) {
   var start = bd.offsetInBytes + offset;
   var remaining = bd.lengthInBytes - start;
@@ -136,6 +139,7 @@ int __check(int offset, int size, ByteData bd) {
     throw ArgumentError('$size is greater than $remaining remaining int $bd');
   return offset;
 }
+*/
 
 /* Urgent remove
 /// Utility for debugging

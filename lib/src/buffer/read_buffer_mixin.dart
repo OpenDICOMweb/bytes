@@ -22,6 +22,8 @@ mixin ReadBufferMixin {
   int get wIndex;
   set wIndex(int n);
 
+  bool rHasRemaining(int length);
+
   Uint8List asUint8List([int start, int length]);
   ByteData asByteData([int offset, int length]);
   void rError(Object msg);
@@ -188,29 +190,92 @@ mixin ReadBufferMixin {
     return v;
   }
 
-  // Urgent decide what the default value of allowInvalid should be.
-  String getString(int length, {bool allowInvalid = false}) => bytes.getString(
-      offset: rIndex, length: length, allowInvalid: allowInvalid);
+  /// Read a short Value Field Length.
+  String readAscii(int length, {bool allowInvalid = true}) {
+    final v = bytes.getAscii(
+        offset: rIndex, length: length, allowInvalid: allowInvalid);
+    rIndex += length;
+    return v;
+  }
 
-  String readString(int length, {bool allowInvalid = false}) {
-    final s = getString(length, allowInvalid: allowInvalid);
+  List<String> readAsciiList(int length,
+      {bool allowInvalid = false, String separator = '\\'}) {
+    final list = bytes.getAsciiList(
+        offset: rIndex,
+        length: length,
+        allowInvalid: allowInvalid,
+        separator: separator);
+    rIndex += length;
+    return list;
+  }
+
+  /// Read a short Value Field Length.
+  String readLatin(int length, {bool allowInvalid = true}) {
+    final v = bytes.getLatin(
+        offset: rIndex, length: length, allowInvalid: allowInvalid);
+    rIndex += length;
+    return v;
+  }
+
+  List<String> readLatinList(int length,
+      {bool allowInvalid = false, String separator = '\\'}) {
+    final list = bytes.getLatinList(
+        offset: rIndex,
+        length: length,
+        allowInvalid: allowInvalid,
+        separator: separator);
+    rIndex += length;
+    return list;
+  }
+
+  /// Read a short Value Field Length.
+  String readUtf8(int length, {bool allowInvalid = true}) {
+    final s = bytes.getUtf8(
+        offset: rIndex, length: length, allowInvalid: allowInvalid);
     rIndex += length;
     return s;
   }
 
+  List<String> readUtf8List(int length,
+      {bool allowInvalid = false, String separator = '\\'}) {
+    final list = bytes.getUtf8List(
+        offset: rIndex,
+        length: length,
+        allowInvalid: allowInvalid,
+        separator: separator);
+    rIndex += length;
+    return list;
+  }
+
+  String readString(int length, {bool allowInvalid = false}) {
+    final s = bytes.getString(
+        offset: rIndex, length: length, allowInvalid: allowInvalid);
+    rIndex += length;
+    return s;
+  }
+
+/*
   // Urgent move to dicom_read_buffer
   bool getUint32AndCompare(int target) {
     final delimiter = bytes.getUint32(rIndex);
     final v = target == delimiter;
     return v;
   }
+*/
 
-  List<String> readStringList(int length, {bool allowInvalid = false}) {
-    final s = bytes.getString(
-        offset: rIndex, length: length, allowInvalid: allowInvalid);
-    final v = s.split('\\');
+  List<String> getStringList(int length, {bool allowInvalid = false}) =>
+      bytes.getStringList(
+          offset: rIndex, length: length, allowInvalid: allowInvalid);
+
+  List<String> readStringList(int length,
+      {bool allowInvalid = false, String separator = '\\'}) {
+    final list = bytes.getStringList(
+        offset: rIndex,
+        length: length,
+        allowInvalid: allowInvalid,
+        separator: separator);
     rIndex += length;
-    return v;
+    return list;
   }
 
   Uint8List get contentsRead =>

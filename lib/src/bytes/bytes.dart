@@ -81,13 +81,6 @@ abstract class Bytes extends ListBase<int>
           ? BytesLittleEndian.fromList(list)
           : BytesBigEndian.fromList(list);
 
-  /// Returns a [Bytes] containing the Utf8 decoding of [s].
-  factory Bytes.fromString(String s) {
-    if (s.isEmpty) return kEmptyBytes;
-    Uint8List list = cvt.utf8.encode(s);
-    return  Bytes.typedDataView(list);
-  }
-
   @override
   int operator [](int i) => buf[i];
 
@@ -202,11 +195,24 @@ abstract class Bytes extends ListBase<int>
 
   // **** Get Strings and List<String>
 
-  /// Returns a [String] containing a _ASCII_ decoding of the specified
+  /// Returns a [String] containing an _ASCII_ decoding of the specified
   /// region of _this_.
   String getAscii({int offset = 0, int length, bool allowInvalid = true}) =>
       cvt.ascii.decode(asUint8List(offset, length ?? this.length),
           allowInvalid: allowInvalid);
+
+  /// Returns a [List<String>] containing an _ASCII_ decoding of the specified
+  /// region of _this_, which is then _split_ using [separator].
+  List<String> getAsciiList(
+          {int offset = 0,
+          int length,
+          bool allowInvalid = true,
+          String separator = '\\'}) =>
+      getAscii(
+              offset: offset,
+              length: length ?? this.length,
+              allowInvalid: allowInvalid)
+          .split(separator);
 
   /// Returns a [String] containing a _Latin_ decoding of the specified
   /// region of _this_.
@@ -214,10 +220,18 @@ abstract class Bytes extends ListBase<int>
       cvt.latin1.decode(asUint8List(offset, length ?? this.length),
           allowInvalid: allowInvalid);
 
-  /// Returns a [String] containing a _ASCII_ decoding of the specified
-  /// region of _this_.
-  String getBase64([int offset = 0, int length]) =>
-      cvt.base64.encode(asUint8List(offset, length ?? this.length));
+  /// Returns a [List<String>] containing an _LATIN_ decoding of the specified
+  /// region of _this_, which is then _split_ using [separator].
+  List<String> getLatinList(
+          {int offset = 0,
+          int length,
+          bool allowInvalid = true,
+          String separator = '\\'}) =>
+      getLatin(
+              offset: offset,
+              length: length ?? this.length,
+              allowInvalid: allowInvalid)
+          .split(separator);
 
   /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
   String getUtf8({int offset = 0, int length, bool allowInvalid = true}) {
@@ -226,9 +240,40 @@ abstract class Bytes extends ListBase<int>
     return s;
   }
 
+  /// Returns a [List<String>] containing an _UTF8_ decoding of the specified
+  /// region of _this_, which is then _split_ using [separator].
+  List<String> getUtf8List(
+          {int offset = 0,
+          int length,
+          bool allowInvalid = true,
+          String separator = '\\'}) =>
+      getUtf8(
+              offset: offset,
+              length: length ?? this.length,
+              allowInvalid: allowInvalid)
+          .split(separator);
+
   /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
   String getString({int offset = 0, int length, bool allowInvalid = true}) =>
       getUtf8(offset: offset, length: length, allowInvalid: allowInvalid);
+
+  /// Returns a [List<String>] containing an _UTF8_ decoding of the specified
+  /// region of _this_, which is then _split_ using [separator].
+  List<String> getStringList(
+          {int offset = 0,
+          int length,
+          bool allowInvalid = true,
+          String separator = '\\'}) =>
+      getUtf8(
+              offset: offset,
+              length: length ?? this.length,
+              allowInvalid: allowInvalid)
+          .split(separator);
+
+  /// Returns a [String] containing a _Base64_ encoding of the specified
+  /// region of _this_.
+  String getBase64([int offset = 0, int length]) =>
+      cvt.base64.encode(asUint8List(offset, length ?? this.length));
 
   // **** Setters that have no Endianness
 
@@ -387,6 +432,60 @@ abstract class Bytes extends ListBase<int>
 
   /// The canonical empty (zero length) [Bytes] object.
   static final Bytes kEmptyBytes = Bytes.empty(0);
+
+  // Urgent: unit test
+  /// Returns a [Bytes] containing the ASCII encoding of [s].
+  static BytesLittleEndian fromAscii(String s) =>
+      _stringToBytes(s, cvt.ascii.encode);
+
+  /// Returns a [Bytes] containing the ASCII encoding of [list].
+  static BytesLittleEndian fromAsciiList(List<String> list) =>
+      _listToBytes(list, cvt.ascii.encode);
+
+  // Urgent: unit test
+  /// Returns a [Bytes] containing the Utf8 decoding of [s].
+  static BytesLittleEndian fromLatin(String s) =>
+      _stringToBytes(s, cvt.latin1.encode);
+
+  /// Returns a [Bytes] containing the ASCII encoding of [list].
+  static BytesLittleEndian fromLatinList(List<String> list) =>
+      _listToBytes(list, cvt.latin1.encode);
+
+  // Urgent: unit test
+  /// Returns a [Bytes] containing the Utf8 decoding of [s].
+  static BytesLittleEndian fromUtf8(String s) =>
+      _stringToBytes(s, cvt.utf8.encode);
+
+  /// Returns a [Bytes] containing the ASCII encoding of [list].
+  static BytesLittleEndian fromUtf8List(List<String> list) =>
+      _listToBytes(list, cvt.utf8.encode);
+
+  // Urgent: unit test
+  /// Returns a [Bytes] containing the Utf8 decoding of [s].
+  static BytesLittleEndian fromString(String s) => fromUtf8(s);
+
+  /// Returns a [Bytes] containing the ASCII encoding of [list].
+  static BytesLittleEndian fromStringList(List<String> list) =>
+      fromUtf8List(list);
+
+  // Urgent: unit test
+  /// Returns a [Bytes] containing the Base64 decoding of [s].
+  static BytesLittleEndian fromBase64(String s) =>
+      _stringToBytes(s, cvt.ascii.encode);
+}
+
+// Urgent: unit test
+/// Returns a [Bytes] containing a decoding of [s].
+BytesLittleEndian _stringToBytes(String s, List<int> decoder(String s)) {
+  if (s.isEmpty) return Bytes.kEmptyBytes;
+  Uint8List list = decoder(s);
+  return Bytes.typedDataView(list);
+}
+
+/// Returns a [Bytes] containing a decoding of [list].
+BytesLittleEndian _listToBytes(List<String> list, Uint8List decoder(String s)) {
+  var s = list.join('\\').trimLeft();
+  return _stringToBytes(s, decoder);
 }
 
 ///

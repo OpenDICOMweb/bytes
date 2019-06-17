@@ -227,7 +227,11 @@ mixin WriteBufferMixin {
     return true;
   }
 
-  // **** List writing methods
+
+  @override
+  String toString() => '$runtimeType($bytes.length)[$wIndex]';
+
+  // **** List growing methods
 
   /// Ensures that [bytes] has at least [remaining] writable _bytes.
   /// The [bytes] is grows if necessary, and copies existing _bytes into
@@ -242,9 +246,6 @@ mixin WriteBufferMixin {
     if (wIndex + size < bytes.length) return false;
     return bytes.ensureLength(wIndex + size);
   }
-
-  @override
-  String toString() => '$runtimeType($bytes.length)[$wIndex]';
 
   Uint8List close() {
     final list = bytes.asUint8List(0, wIndex);

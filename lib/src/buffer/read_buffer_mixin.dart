@@ -192,64 +192,48 @@ mixin ReadBufferMixin {
 
   /// Read a short Value Field Length.
   String readAscii(int length, {bool allowInvalid = true}) {
-    final v = bytes.getAscii(
-        offset: rIndex, length: length, allowInvalid: allowInvalid);
+    final v = bytes.getAscii(rIndex, length);
     rIndex += length;
     return v;
   }
 
   List<String> readAsciiList(int length,
       {bool allowInvalid = false, String separator = '\\'}) {
-    final list = bytes.getAsciiList(
-        offset: rIndex,
-        length: length,
-        allowInvalid: allowInvalid,
-        separator: separator);
+    final list = bytes.getAsciiList(rIndex, length);
     rIndex += length;
     return list;
   }
 
   /// Read a short Value Field Length.
   String readLatin(int length, {bool allowInvalid = true}) {
-    final v = bytes.getLatin(
-        offset: rIndex, length: length, allowInvalid: allowInvalid);
+    final v = bytes.getLatin(rIndex, length);
     rIndex += length;
     return v;
   }
 
   List<String> readLatinList(int length,
       {bool allowInvalid = false, String separator = '\\'}) {
-    final list = bytes.getLatinList(
-        offset: rIndex,
-        length: length,
-        allowInvalid: allowInvalid,
-        separator: separator);
+    final list = bytes.getLatinList(rIndex, length);
     rIndex += length;
     return list;
   }
 
   /// Read a short Value Field Length.
   String readUtf8(int length, {bool allowInvalid = true}) {
-    final s = bytes.getUtf8(
-        offset: rIndex, length: length, allowInvalid: allowInvalid);
+    final s = bytes.getUtf8(rIndex, length);
     rIndex += length;
     return s;
   }
 
   List<String> readUtf8List(int length,
       {bool allowInvalid = false, String separator = '\\'}) {
-    final list = bytes.getUtf8List(
-        offset: rIndex,
-        length: length,
-        allowInvalid: allowInvalid,
-        separator: separator);
+    final list = bytes.getUtf8List(rIndex, length);
     rIndex += length;
     return list;
   }
 
   String readString(int length, {bool allowInvalid = false}) {
-    final s = bytes.getString(
-        offset: rIndex, length: length, allowInvalid: allowInvalid);
+    final s = bytes.getString(rIndex, length);
     rIndex += length;
     return s;
   }
@@ -264,16 +248,11 @@ mixin ReadBufferMixin {
 */
 
   List<String> getStringList(int length, {bool allowInvalid = false}) =>
-      bytes.getStringList(
-          offset: rIndex, length: length, allowInvalid: allowInvalid);
+      bytes.getStringList(rIndex, length);
 
   List<String> readStringList(int length,
       {bool allowInvalid = false, String separator = '\\'}) {
-    final list = bytes.getStringList(
-        offset: rIndex,
-        length: length,
-        allowInvalid: allowInvalid,
-        separator: separator);
+    final list = bytes.getStringList(rIndex, length);
     rIndex += length;
     return list;
   }

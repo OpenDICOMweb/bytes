@@ -15,6 +15,12 @@ import 'package:bytes/src/bytes/bytes_get_mixin.dart';
 import 'package:bytes/src/bytes/bytes_set_mixin.dart';
 import 'package:bytes/src/constants.dart';
 
+typedef Decoder = String Function(Uint8List list, {bool allowInvalid});
+typedef Encoder = Uint8List Function(String s);
+
+const _kNull = 0;
+const _kSpace = 32;
+
 /// The length at which _ensureLength_ switches from doubling the
 /// underlying [Uint8List] _buf_ to incrementing by [largeChunkIncrement].
 int doublingLimit = 128 * k1MB;
@@ -34,11 +40,13 @@ abstract class Bytes extends ListBase<int>
     with BytesGetMixin, BytesSetMixin
     implements Comparable<Bytes> {
   @override
-  Uint8List buf;
+  Uint8List get buf;
+  set buf(Uint8List list);
+
   ByteData _bd;
 
   /// Internal Constructor
-  Bytes(this.buf);
+  Bytes();
 
   /// Creates a new [Bytes] containing [length] elements.
   /// [length] defaults to [kDefaultLength] and [endian] defaults
@@ -101,6 +109,24 @@ abstract class Bytes extends ListBase<int>
     for (var i = 0; i < buf.length; i++) hashCode += buf[i] % 17;
     return hashCode;
   }
+
+  // Urgent: What if it is more than one character?
+  /// The character used to separate [String]s when a [List<String>] is
+  /// encoded as a [Uint8List].
+  String stringSeparator = '\\';
+
+  List<String> _split(String s) {
+    final x = s.trimLeft();
+    return (x.isEmpty) ? <String>[] : s.split(stringSeparator);
+  }
+
+  /// If true decoding of [Uint8List]s may contain invalid code points.
+  bool allowInvalid = true;
+
+  /// If _true_ padding at the end of Value Fields will be ignored.
+  ///
+  /// _Note_: Only used by == operator.
+  bool noPadding = false;
 
   @override
   ByteData get bd => _bd ??= buf.buffer.asByteData(buf.offsetInBytes);
@@ -197,83 +223,65 @@ abstract class Bytes extends ListBase<int>
 
   /// Returns a [String] containing an _ASCII_ decoding of the specified
   /// region of _this_.
-  String getAscii({int offset = 0, int length, bool allowInvalid = true}) =>
-      cvt.ascii.decode(asUint8List(offset, length ?? this.length),
-          allowInvalid: allowInvalid);
+  String getAscii([int offset = 0, int length]) =>
+      _getString(offset, length, _ascii);
 
   /// Returns a [List<String>] containing an _ASCII_ decoding of the specified
-  /// region of _this_, which is then _split_ using [separator].
-  List<String> getAsciiList(
-          {int offset = 0,
-          int length,
-          bool allowInvalid = true,
-          String separator = '\\'}) =>
-      getAscii(
-              offset: offset,
-              length: length ?? this.length,
-              allowInvalid: allowInvalid)
-          .split(separator);
+  /// region of _this_, which is then _split_ using [stringSeparator].
+  List<String> getAsciiList([int offset = 0, int length]) =>
+      _split(_getString(offset, length, _ascii));
 
   /// Returns a [String] containing a _Latin_ decoding of the specified
   /// region of _this_.
-  String getLatin({int offset = 0, int length, bool allowInvalid = true}) =>
-      cvt.latin1.decode(asUint8List(offset, length ?? this.length),
-          allowInvalid: allowInvalid);
+  String getLatin([int offset = 0, int length]) =>
+      _getString(offset, length, _latin);
 
   /// Returns a [List<String>] containing an _LATIN_ decoding of the specified
-  /// region of _this_, which is then _split_ using [separator].
-  List<String> getLatinList(
-          {int offset = 0,
-          int length,
-          bool allowInvalid = true,
-          String separator = '\\'}) =>
-      getLatin(
-              offset: offset,
-              length: length ?? this.length,
-              allowInvalid: allowInvalid)
-          .split(separator);
+  /// region of _this_, which is then _split_ using [stringSeparator].
+  List<String> getLatinList([int offset = 0, int length]) =>
+      _split(_getString(offset, length, _ascii));
 
   /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
-  String getUtf8({int offset = 0, int length, bool allowInvalid = true}) {
-    final s = cvt.utf8.decode(asUint8List(offset, length ?? this.length),
-        allowMalformed: allowInvalid);
-    return s;
-  }
+  String getUtf8([int offset = 0, int length]) =>
+      _getString(offset, length, _utf8);
 
   /// Returns a [List<String>] containing an _UTF8_ decoding of the specified
-  /// region of _this_, which is then _split_ using [separator].
-  List<String> getUtf8List(
-          {int offset = 0,
-          int length,
-          bool allowInvalid = true,
-          String separator = '\\'}) =>
-      getUtf8(
-              offset: offset,
-              length: length ?? this.length,
-              allowInvalid: allowInvalid)
-          .split(separator);
+  /// region of _this_, which is then _split_ using [stringSeparator].
+  List<String> getUtf8List([int offset = 0, int length]) =>
+      _split(_getString(offset, length, _utf8));
 
-  /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
-  String getString({int offset = 0, int length, bool allowInvalid = true}) =>
-      getUtf8(offset: offset, length: length, allowInvalid: allowInvalid);
+  /// Returns a [String] containing a decoding of the specified region.
+  /// If [decoder] is not specified, it defaults to _UTF-8_.
+  String getString([int offset = 0, int length, Decoder decoder]) =>
+      _getString(offset, length, decoder ?? _utf8);
 
-  /// Returns a [List<String>] containing an _UTF8_ decoding of the specified
-  /// region of _this_, which is then _split_ using [separator].
-  List<String> getStringList(
-          {int offset = 0,
-          int length,
-          bool allowInvalid = true,
-          String separator = '\\'}) =>
-      getUtf8(
-              offset: offset,
-              length: length ?? this.length,
-              allowInvalid: allowInvalid)
-          .split(separator);
+  /// Returns a [List<String>]. This is done by first decoding
+  /// the specified region using [decoder], and then _split_ing the
+  /// resulting [String] using the [stringSeparator] character.
+  List<String> getStringList([int offset = 0, int length, Decoder decoder]) =>
+      _split(_getString(offset, length, decoder ?? _utf8));
 
   /// Returns a [String] containing a _Base64_ encoding of the specified
   /// region of _this_.
   String getBase64([int offset = 0, int length]) =>
       cvt.base64.encode(asUint8List(offset, length ?? this.length));
+
+  String _getString(int offset, int length, Decoder decoder) {
+    var list = asUint8List(offset, length ?? buf.length);
+    list = noPadding ? _removePadding(list) : list;
+    return list.isEmpty ? '' : decoder(list, allowInvalid: allowInvalid);
+  }
+
+  Uint8List _removePadding(Uint8List list) {
+    const kSpace = 32;
+    const kNull = 0;
+    if (list.isEmpty) return list;
+    final lastIndex = list.length - 1;
+    final c = list[lastIndex];
+    return (c == kSpace || c == kNull)
+        ? list.buffer.asUint8List(list.offsetInBytes, lastIndex)
+        : list;
+  }
 
   // **** Setters that have no Endianness
 
@@ -325,33 +333,107 @@ abstract class Bytes extends ListBase<int>
 
   // **** String Setters
 
+  // TODO: unit test
+  /// Ascii encodes the specified range of [s] and then writes the
+  /// code units to _this_ starting at [start]. If [padChar] is not
+  /// _null_ and [s].length is odd, then [padChar] is written after
+  /// the code units of [s] have been written.
+  @override
+  int setAscii(int start, String s,
+      [int offset = 0, int length, int padChar = _kSpace]) =>
+      _setStringBytes(start, cvt.ascii.encode(s), 0, null, padChar);
+
+
+  /// Writes the ASCII [String]s in [sList] to _this_ starting at
+  /// [start]. If [padChar] is not _null_ and the final offset is odd,
+  /// then [padChar] is written after the other elements have been written.
+  /// Returns the number of bytes written.
+  int setAsciiList(int start, List<String> sList, [int padChar = _kSpace]) =>
+      _setLatinList(start, sList, padChar, 127);
+
+  // TODO: unit test
+  /// UTF-8 encodes the specified range of [s] and then writes the
+  /// code units to _this_ starting at [start]. Returns the offset
+  /// of the last byte + 1.
+  int setLatin(int start, String s,
+      [int offset = 0, int length, int padChar = _kSpace]) =>
+      _setStringBytes(start, cvt.latin1.encode(s), 0, null, padChar);
+
+  /// Writes the LATIN [String]s in [sList] to _this_ starting at
+  /// [start]. If [padChar] is not _null_ and the final offset is odd,
+  /// then [padChar] is written after the other elements have been written.
+  /// Returns the number of bytes written.
+  /// _Note_: All latin character sets are encoded as single 8-bit bytes.
+  int setLatinList(int start, List<String> sList, [int padChar = _kSpace]) =>
+      _setLatinList(start, sList, padChar, 255);
+
+  /// Copy [String]s from [sList] into _this_ separated by backslash.
+  /// If [padChar] is not equal to _null_ and last character position
+  /// is odd, then add [padChar] at end.
+  // Note: this only works for ascii or latin
+  int _setLatinList(
+    int start,
+    List<String> sList,
+    int padChar,
+    int limit,
+  ) {
+    const _kBackslash = 92;
+    assert(padChar == _kSpace || padChar == _kNull);
+    if (sList.isEmpty) return 0;
+    final last = sList.length - 1;
+    var k = start;
+
+    for (var i = 0; i < sList.length; i++) {
+      final s = sList[i];
+      for (var j = 0; j < s.length; j++) {
+        final c = s.codeUnitAt(j);
+        if (c > limit)
+          throw ArgumentError('Character code $c is out of range $limit');
+        setUint8(k++, s.codeUnitAt(j));
+      }
+      if (i != last) setUint8(k++, _kBackslash);
+    }
+    if (k.isOdd && padChar != null) setUint8(k++, padChar);
+    return k - start;
+  }
+
+  // TODO: unit test
+  /// UTF-8 encodes [s] and then writes the code units to _this_
+  /// starting at [start]. Returns the offset of the last byte + 1.
+  @override
+  int setUtf8(int start, String s, [int padChar = _kSpace]) =>
+      _setStringBytes(start, cvt.utf8.encode(s), 0, null, padChar);
+
+  /// Converts the [String]s in [sList] into a [Uint8List].
+  /// Then copies the bytes into _this_ starting at
+  /// [start]. If [padChar] is not _null_ and the offset of the last
+  /// byte written is odd, then [padChar] is written to _this_.
+  /// Returns the number of bytes written.
+  int setUtf8List(int start, List<String> sList, [int padChar]) =>
+      setUtf8(start, sList.join(stringSeparator), padChar);
+
+  /// Moves bytes from [list] to _this_. If [list].[length] is odd adds [pad]
+  /// as last byte. Returns the number of bytes written.
+  int _setStringBytes(int start, Uint8List list,
+      [int offset = 0, int length, int pad = _kSpace]) {
+    length ??= list.length;
+    for (var i = offset, j = start; i < length; i++, j++) buf[j] = list[i];
+    if (length.isOdd && pad != null) {
+      setUint8(length + start, pad);
+      return length + 1;
+    }
+    return length;
+  }
+
   // TODO fix to use Latin
   /// UTF-8 encodes the specified range of [s] and then writes the
   /// code units to _this_ starting at [start]. Returns the offset
   /// of the last byte + 1.
   ///
   /// Note: Currently only encodes Latin1.
-  void setString(int start, String s, [int offset = 0, int length]) =>
-      setLatin(start, s);
-
-  // TODO: unit test
-  /// UTF-8 encodes the specified range of [s] and then writes the
-  /// code units to _this_ starting at [start]. Returns the offset
-  /// of the last byte + 1.
-  int setUtf8(int start, String s) => setUint8List(start, cvt.utf8.encode(s));
-
-  // TODO: unit test
-  /// UTF-8 encodes the specified range of [s] and then writes the
-  /// code units to _this_ starting at [start]. Returns the offset
-  /// of the last byte + 1.
-  int setAscii(int start, String s) => setUint8List(start, cvt.ascii.encode(s));
-
-  // TODO: unit test
-  /// UTF-8 encodes the specified range of [s] and then writes the
-  /// code units to _this_ starting at [start]. Returns the offset
-  /// of the last byte + 1.
-  int setLatin(int start, String s) =>
-      setUint8List(start, cvt.latin1.encode(s));
+  void setString(int start, String s,
+      [Encoder encoder, int offset = 0, int length, int pad = _kSpace]) =>
+      _setStringBytes(start, encoder(s), offset, length, pad);
 
   // *** Comparable interface
 
@@ -511,4 +593,14 @@ class AlignmentError extends Error {
 void alignmentError(
     Uint8List buf, int offsetInBytes, int lengthInBytes, int sizeInBytes) {
   throw AlignmentError(buf, offsetInBytes, lengthInBytes, sizeInBytes);
+}
+
+// **** local code
+final _ascii = cvt.ascii.decode;
+final _latin = cvt.latin1.decode;
+
+// Urgent: remove this when cvt.utf8.decode take a Uint8List argument.
+String _utf8(List<int> list, {bool allowInvalid}) {
+  final u8List = (list is Uint8List) ? list : Uint8List.fromList(list);
+  return cvt.utf8.decode(u8List, allowMalformed: allowInvalid);
 }

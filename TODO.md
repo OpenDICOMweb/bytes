@@ -10,6 +10,7 @@
 
 ### Current
 
+1. test noPadding
 1. Separate String methods into Mixin.
 1. make all test look like bytes_float32_test
 1. Add test for all get/set methods little-endian and big-endian

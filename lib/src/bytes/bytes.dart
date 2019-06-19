@@ -341,7 +341,7 @@ abstract class Bytes extends ListBase<int>
   @override
   int setAscii(int start, String s,
       [int offset = 0, int length, int padChar = _kSpace]) =>
-      _setStringBytes(start, cvt.ascii.encode(s), 0, null, padChar);
+      _setStringBytes(start, cvt.ascii.encode(s), 0, length, padChar);
 
 
   /// Writes the ASCII [String]s in [sList] to _this_ starting at
@@ -419,7 +419,9 @@ abstract class Bytes extends ListBase<int>
     length ??= list.length;
     for (var i = offset, j = start; i < length; i++, j++) buf[j] = list[i];
     if (length.isOdd && pad != null) {
-      setUint8(length + start, pad);
+      final end = offset + length;
+      if (end > buf.length) throw ArgumentError();
+      buf[end] = pad;
       return length + 1;
     }
     return length;

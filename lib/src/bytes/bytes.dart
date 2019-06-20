@@ -338,7 +338,6 @@ abstract class Bytes extends ListBase<int>
   /// code units to _this_ starting at [start]. If [padChar] is not
   /// _null_ and [s].length is odd, then [padChar] is written after
   /// the code units of [s] have been written.
-  @override
   int setAscii(int start, String s,
       [int offset = 0, int length, int padChar = _kSpace]) =>
       _setStringBytes(start, cvt.ascii.encode(s), 0, length, padChar);
@@ -400,7 +399,6 @@ abstract class Bytes extends ListBase<int>
   // TODO: unit test
   /// UTF-8 encodes [s] and then writes the code units to _this_
   /// starting at [start]. Returns the offset of the last byte + 1.
-  @override
   int setUtf8(int start, String s, [int padChar = _kSpace]) =>
       _setStringBytes(start, cvt.utf8.encode(s), 0, null, padChar);
 

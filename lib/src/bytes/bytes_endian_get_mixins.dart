@@ -106,6 +106,7 @@ mixin BigEndianGetMixin {
   int _check(int offset, int size) => __check(offset, size, bd);
 }
 
+// Urgent: are this check necessary with ByteData
 int __check(int offset, int size, ByteData bd) {
   var start = bd.offsetInBytes + offset;
   var remaining = bd.lengthInBytes - start;
@@ -113,16 +114,3 @@ int __check(int offset, int size, ByteData bd) {
     throw ArgumentError('$size is greater than $remaining remaining int $bd');
   return offset;
 }
-
-/* Urgent remove
-/// Utility for debugging
-void printIt(int offset, int size, ByteData bd) {
-  var s = '''
-         offset $offset
-           size $size
-offset in bytes ${bd.offsetInBytes}
-  size in bytes ${bd.lengthInBytes}
-  ''';
-  print(s);
-}
-*/

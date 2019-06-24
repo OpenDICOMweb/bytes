@@ -1,8 +1,18 @@
 # Bytes
 
 
-The Bytes package 
+The Bytes package:
+    -  Combines Uint8List and ByteData.
+    - _Endianness_ is declared when the Bytes are created.
+    - Includes methods for getting/setting Ascii, Latin, and Utf8 Stringss
+    - Includes methods for getting/setting all TypedData classes 
 
+# Design
+The Bytes class combines Uint8List and ByteData. The _endianness_
+of a Bytes is declared at the time it is created, and then remains the
+same for it lifetime.
+
+_Note_: 
 # Basics
 
 All _String_s when converted to Bytes are UTF8

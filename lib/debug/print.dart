@@ -6,6 +6,7 @@
 //  Primary Author: Jim Philbin <jfphilbin@gmail.edu>
 //  See the AUTHORS file for other contributors.
 //
+import 'dart:typed_data';
 import 'package:bytes/bytes.dart';
 
 /// If _this_ has a length greater than the value, then the
@@ -33,3 +34,16 @@ String bytesInfo(Bytes bytes) {
   }
   return '$sb';
 }
+
+// ToDo remove?
+/// Utility for debugging
+void printIt(int offset, int size, ByteData bd) {
+  var s = '''
+         offset $offset
+           size $size
+offset in bytes ${bd.offsetInBytes}
+  size in bytes ${bd.lengthInBytes}
+  ''';
+  print(s);
+}
+

@@ -54,11 +54,4 @@ class BytesBuffer extends BytesBufferBase
       : bytes = Bytes.typedDataView(td, offset, length, endian),
         rIndex = offset ?? td.offsetInBytes,
         wIndex = length ?? td.lengthInBytes;
-
-
-
-
-
-
-
 }

@@ -42,9 +42,6 @@ mixin ReadBufferMixin {
     return bytes.asByteData(start, length);
   }
 
-  /// Returns the Int8 value at [rIndex].
-  int getInt8() => bytes.getInt8(rIndex);
-
   int readInt8() {
     final v = bytes.getInt8(rIndex);
     rIndex++;
@@ -56,8 +53,6 @@ mixin ReadBufferMixin {
     rIndex += length;
     return v;
   }
-
-  int getInt16() => bytes.getInt16(rIndex);
 
   int readInt16() {
     final v = bytes.getInt16(rIndex);
@@ -71,8 +66,6 @@ mixin ReadBufferMixin {
     return v;
   }
 
-  int getInt32() => bytes.getInt32(rIndex);
-
   int readInt32() {
     final v = bytes.getInt32(rIndex);
     rIndex += 4;
@@ -85,8 +78,6 @@ mixin ReadBufferMixin {
     return v;
   }
 
-  int getInt64() => bytes.getInt64(rIndex);
-
   int readInt64() {
     final v = bytes.getInt64(rIndex);
     rIndex += 8;
@@ -98,8 +89,6 @@ mixin ReadBufferMixin {
     rIndex += length * kInt64Size;
     return v;
   }
-
-  int getUint8() => bytes.getUint8(rIndex);
 
   int readUint8() {
     final v = bytes.getUint8(rIndex);
@@ -120,8 +109,6 @@ mixin ReadBufferMixin {
     return v;
   }
 
-  int getUint16() => bytes.getUint16(rIndex);
-
   int readUint16() {
     final v = bytes.getUint16(rIndex);
     rIndex += 2;
@@ -133,8 +120,6 @@ mixin ReadBufferMixin {
     rIndex += length * kUint16Size;
     return v;
   }
-
-  int getUint32() => bytes.getUint32(rIndex);
 
   int readUint32() {
     final v = bytes.getUint32(rIndex);
@@ -148,8 +133,6 @@ mixin ReadBufferMixin {
     return v;
   }
 
-  int getUint64() => bytes.getUint64(rIndex);
-
   int readUint64() {
     final v = bytes.getUint64(rIndex);
     rIndex += 8;
@@ -162,8 +145,6 @@ mixin ReadBufferMixin {
     return v;
   }
 
-  double getFloat32() => bytes.getFloat32(rIndex);
-
   double readFloat32() {
     final v = bytes.getFloat32(rIndex);
     rIndex += 4;
@@ -175,8 +156,6 @@ mixin ReadBufferMixin {
     rIndex += length * kFloat32Size;
     return v;
   }
-
-  double getFloat64() => bytes.getFloat64(rIndex);
 
   double readFloat64() {
     final v = bytes.getFloat64(rIndex);
@@ -237,15 +216,6 @@ mixin ReadBufferMixin {
     rIndex += length;
     return s;
   }
-
-/*
-  // Urgent move to dicom_read_buffer
-  bool getUint32AndCompare(int target) {
-    final delimiter = bytes.getUint32(rIndex);
-    final v = target == delimiter;
-    return v;
-  }
-*/
 
   List<String> getStringList(int length, {bool allowInvalid = false}) =>
       bytes.getStringList(rIndex, length);

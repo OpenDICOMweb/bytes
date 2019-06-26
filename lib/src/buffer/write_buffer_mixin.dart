@@ -227,7 +227,6 @@ mixin WriteBufferMixin {
     return true;
   }
 
-
   @override
   String toString() => '$runtimeType($bytes.length)[$wIndex]';
 

@@ -96,6 +96,8 @@ void main() {
         final s3 = bytes2.getAscii();
         final vList3 = sSplit(s3);
         expect(vList3, equals(vList2));
+
+        //TODO add test with string at an offset
       }
     });
 
@@ -164,8 +166,6 @@ void main() {
         expect(bytes0.endian == Endian.little, isTrue);
 
         final s1 = bytes0.getLatin();
- //       print('s0 "$s0"');
- //       print('s1 "$s1"');
         expect(s0 == s1, isTrue);
         final vList1 = sSplit(s1);
         isValidUtf8List(vList1);

@@ -23,7 +23,7 @@ void main() {
         expect(buf.bytes.buf.buffer == bytes.buf.buffer, isTrue);
         expect(buf.bytes == bytes, isTrue);
         expect(buf.length == bytes.length, isTrue);
-        expect(buf.getInt8() == bytes.getInt8(0), isTrue);
+        expect(buf.bytes.getInt8(0) == bytes.getInt8(0), isTrue);
 
         expect(buf.rIndex == 0, isTrue);
         expect(buf.wIndex == bytes.length, isTrue);

@@ -11,7 +11,6 @@ import 'package:bytes/bytes.dart';
 import 'package:bytes/src/buffer/bytes_buffer_base.dart';
 import 'package:bytes/src/buffer/read_buffer_mixin.dart';
 
-
 /// A read only BytesBuffer.
 
 class ReadBuffer extends BytesBufferBase with ReadBufferMixin {
@@ -20,39 +19,37 @@ class ReadBuffer extends BytesBufferBase with ReadBufferMixin {
   @override
   int rIndex;
   @override
-  int wIndex;
+  int get wIndex => bytes.length;
+  @override
+  set wIndex(int offset) => throw UnsupportedError('wIndex is not settable');
 
   /// Creates a [ReadBuffer] of [length] starting at [offset] in [bytes].
-  ReadBuffer(this.bytes, [int offset = 0, int length])
-      : rIndex = offset ?? 0,
-        wIndex = length ?? bytes.length;
+  ReadBuffer(Bytes bytes, [int offset = 0, int length])
+      : bytes = bytes.asBytes(offset, length),
+        rIndex = 0;
 
   /// Creates a [ReadBuffer] from another [ReadBuffer].
   ReadBuffer.from(ReadBuffer rb,
       [int offset = 0, int length, Endian endian = Endian.little])
       : bytes = Bytes.from(rb.bytes, offset, length, endian),
-        rIndex = offset ?? rb.bytes.offset,
-        wIndex = length ?? rb.bytes.length;
+        rIndex = offset ?? rb.bytes.offset;
 
   /// Creates a [ReadBuffer] from a [ByteData].
   ReadBuffer.fromByteData(ByteData td,
       [int offset = 0, int length, Endian endian = Endian.little])
       : bytes = Bytes.typedDataView(td, offset, length, endian),
-        rIndex = offset ?? td.offsetInBytes,
-        wIndex = length ?? td.lengthInBytes;
+        rIndex = offset ?? td.offsetInBytes;
 
   /// Creates a [ReadBuffer] from an [List<int>].
   ReadBuffer.fromList(List<int> list, [Endian endian = Endian.little])
       : bytes = Bytes.fromList(list, endian),
-        rIndex = 0,
-        wIndex = list.length;
+        rIndex = 0;
 
   /// Creates a [ReadBuffer] from a view of [td].
   ReadBuffer.typedDataView(TypedData td,
       [int offset = 0, int length, Endian endian = Endian.little])
       : bytes = Bytes.typedDataView(td, offset, length, endian),
-        rIndex = offset ?? td.offsetInBytes,
-        wIndex = length ?? td.lengthInBytes;
+        rIndex = offset ?? td.offsetInBytes;
 
   /// Return a new Big Endian[ReadBuffer] containing the unread
   /// portion of _this_.

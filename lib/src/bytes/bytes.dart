@@ -144,7 +144,7 @@ abstract class Bytes extends ListBase<int>
   /// Returns a view of the specified region of _this_. [endian] defaults
   /// to the same [endian]ness as _this_.
   Bytes asBytes([int offset = 0, int length]) =>
-      Bytes.typedDataView(asUint8List(offset, length ?? this.length));
+      Bytes.typedDataView(asUint8List(offset, length ?? buf.length));
 
   /// Returns an [ByteData] view of the specified region of _this_.
   ByteData asByteData([int offset = 0, int length]) {
@@ -182,7 +182,7 @@ abstract class Bytes extends ListBase<int>
 
   /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
   Uint8List asUint8List([int offset = 0, int length]) =>
-      buf.buffer.asUint8List(buf.offsetInBytes + offset, length ?? buf.length);
+      buf.buffer.asUint8List(offset, length ?? buf.length);
 
   /// Creates an [Int8List] copy of the specified region of _this_.
   ByteData getByteData([int offset = 0, int length]) =>
@@ -227,7 +227,6 @@ abstract class Bytes extends ListBase<int>
   String getString(
           [int offset = 0,
           int length,
-          String separator = '\\',
           Decoder decoder]) =>
       _getString(offset, length, decoder ?? _utf8);
 
@@ -248,7 +247,6 @@ abstract class Bytes extends ListBase<int>
 
   String _getString(int offset, int length, Decoder decoder) {
     var list = asUint8List(offset, length ?? buf.length);
-//    list = noPadding ? _removePadding(list) : list;
     return list.isEmpty ? '' : decoder(list, allowInvalid: allowInvalid);
   }
 
@@ -256,19 +254,6 @@ abstract class Bytes extends ListBase<int>
     final x = s.trimLeft();
     return (x.isEmpty) ? <String>[] : s.split(separator);
   }
-
-/*
-  Uint8List _removePadding(Uint8List list) {
-    const kSpace = 32;
-    const kNull = 0;
-    if (list.isEmpty) return list;
-    final lastIndex = list.length - 1;
-    final c = list[lastIndex];
-    return (c == kSpace || c == kNull)
-        ? list.buffer.asUint8List(list.offsetInBytes, lastIndex)
-        : list;
-  }
-*/
 
   // **** Setters that have no Endianness
 
@@ -383,9 +368,9 @@ abstract class Bytes extends ListBase<int>
 
   /// Moves bytes from [list] to _this_. Returns the number of bytes written.
   int _setStringBytes(int start, Uint8List list) {
-    final len = list.length;
-    for (var i = 0, j = start; i < len; i++, j++) buf[j] = list[i];
-    return len;
+    final length = list.length;
+    for (var i = 0, j = start; i < length; i++, j++) buf[j] = list[i];
+    return length;
   }
 
   // TODO fix to use Latin

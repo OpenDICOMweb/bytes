@@ -33,7 +33,7 @@ class BytesLittleEndian extends Bytes
   /// to [Endian.little].
   BytesLittleEndian.empty([int length = kDefaultLength])
       : assert(length >= 0),
-        buf = Uint8List(length ?? k1MB);
+        buf = Uint8List(length);
 
   /// Returns a view of the specified region of _this_.
   BytesLittleEndian.view(Bytes bytes, [int offset = 0, int length])
@@ -73,7 +73,7 @@ class BytesBigEndian extends Bytes with BigEndianGetMixin, BigEndianSetMixin {
   /// to [Endian.little].
   BytesBigEndian.empty([int length = kDefaultLength])
       : assert(length >= 0),
-        buf = Uint8List(length ?? k1MB);
+        buf = Uint8List(length);
 
   /// Returns a view of the specified region of _this_.
   BytesBigEndian.view(Bytes bytes, [int offset = 0, int length])

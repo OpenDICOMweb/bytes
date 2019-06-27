@@ -130,21 +130,19 @@ abstract class Bytes extends ListBase<int>
   // **** Getters that have no Endianness
 
   /// Creates an [Bytes] copy of the specified region of _this_.
-  Bytes getBytes([int offset = 0, int length]) {
-    final newBuf = getUint8List(offset, length);
-    return Bytes.typedDataView(newBuf);
-  }
+  Bytes getBytes([int offset = 0, int length]) =>
+      Bytes.typedDataView(buf, offset, length ?? buf.length, endian);
 
   /// Creates a new [Bytes] from _this_ containing the specified region.
   /// The [endian]ness is the same as _this_.
   @override
   Bytes sublist([int start = 0, int end]) =>
-      getBytes(start, (end ??= buf.length) - start);
+      Bytes.fromList(buf.sublist(start, end ??= buf.length), endian);
 
   /// Returns a view of the specified region of _this_. [endian] defaults
   /// to the same [endian]ness as _this_.
   Bytes asBytes([int offset = 0, int length]) =>
-      Bytes.typedDataView(asUint8List(offset, length ?? buf.length));
+      Bytes.typedDataView(buf, offset, length ?? buf.length, endian);
 
   /// Returns an [ByteData] view of the specified region of _this_.
   ByteData asByteData([int offset = 0, int length]) {

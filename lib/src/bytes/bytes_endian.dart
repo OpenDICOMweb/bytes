@@ -49,8 +49,7 @@ class BytesLittleEndian extends Bytes
   /// [endian] defaults to [Endian.little].
   BytesLittleEndian.typedDataView(TypedData td,
       [int offset = 0, int lengthInBytes])
-      : buf = td.buffer.asUint8List(
-            td.offsetInBytes + offset, lengthInBytes ?? td.lengthInBytes);
+      : buf = td.buffer.asUint8List(offset, lengthInBytes ?? td.lengthInBytes);
 
   /// Creates a new [Bytes] from a [List<int>].  [endian] defaults
   /// to [Endian.little]. Any values in [list] that are larger than 8-bits

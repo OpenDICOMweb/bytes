@@ -51,6 +51,7 @@ void main() {
         final vList0 = rng.float64List(min, max);
         expect(vList0 is Float64List, isTrue);
         final rBuf = getReadBufferBE(getFloat64BE(vList0));
+        expect(rBuf.endian == Endian.big, isTrue);
         final out = Float64List(vList0.length);
 
         for (var j = 0; j < vList0.length; j++) {

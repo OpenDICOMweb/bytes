@@ -15,8 +15,8 @@ import 'package:bytes/src/constants.dart';
 /// supports both [Uint8List] and [ByteData] interfaces.
 mixin BytesSetMixin implements EndianSetters {
   Uint8List get buf;
-  ByteData get bd;
-  Endian get endian;
+  //ByteData get bd;
+  //Endian get endian;
 
   // **** Int set methods
 

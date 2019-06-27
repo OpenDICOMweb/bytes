@@ -20,7 +20,7 @@ mixin ReadBufferMixin {
 
   /// The current write index in the buffer.
   int get wIndex;
-  set wIndex(int n);
+//  set wIndex(int n);
 
   bool rHasRemaining(int length);
 

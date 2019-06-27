@@ -6,12 +6,16 @@
 //  Primary Author: Jim Philbin <jfphilbin@gmail.edu>
 //  See the AUTHORS file for other contributors.
 //
+import 'dart:convert' as cvt;
 import 'dart:typed_data';
+
+import 'package:bytes/bytes.dart';
 
 /// [BytesGetMixin] is a class that provides a read-only byte array that
 /// supports both [Uint8List] and [ByteData] interfaces.
 mixin BytesGetMixin {
   Uint8List get buf;
+  int get length;
   ByteData get bd;
   Endian get endian;
   String get endianness;
@@ -31,9 +35,38 @@ mixin BytesGetMixin {
   double getFloat64(int offset);
   Float64x2 getFloat64x2(int offset);
 
+  /// If _true_ [Decoder] will allow invalid characters.
+  static bool allowInvalid;
+
   // **** End of Interface
 
+  /// Creates an [Int8List] copy of the specified region of _this_.
+  ByteData getByteData([int offset = 0, int length]) =>
+      getUint8List(offset, length).buffer.asByteData();
+
+  /// Returns an [ByteData] view of the specified region of _this_.
+  ByteData asByteData([int offset = 0, int length]) {
+    length ??= buf.length - offset;
+    return buf.buffer.asByteData(buf.offsetInBytes + offset, length);
+  }
+
   // **** Signed Integer Lists
+
+  /// Returns the 8-bit _signed_ integer value
+  /// (between -128 and 127 inclusive) at index [i].
+  int getInt8(int i) => bd.getInt8(i);
+
+  /// Creates an [Int8List] copy of the specified region of _this_.
+  Int8List getInt8List([int offset = 0, int length]) {
+    length ??= buf.length;
+    final list = Int8List(length);
+    for (var i = 0, j = offset; i < length; i++, j++) list[i] = bd.getInt8(j);
+    return list;
+  }
+
+  /// Creates an [Int8List] view of the specified region of _this_.
+  Int8List asInt8List([int offset = 0, int length]) =>
+      buf.buffer.asInt8List(buf.offsetInBytes + offset, length ??= buf.length);
 
   /// Creates an [Int16List] copy of the specified region of _this_.
   Int16List getInt16List([int offset = 0, int length]) {
@@ -69,6 +102,22 @@ mixin BytesGetMixin {
   }
 
   // **** Unsigned Integer Lists
+
+  /// Returns an 8-bit _unsigned_ integer value
+  /// (between 0 and 255 inclusive) at index [i].
+  int getUint8(int i) => buf[i];
+
+  /// Returns a [Uint8List] that is a copy of the specified region of _this_.
+  Uint8List getUint8List([int offset = 0, int length]) {
+    length ??= buf.length;
+    final list = Uint8List(length);
+    for (var i = 0, j = offset; i < length; i++, j++) list[i] = buf[j];
+    return list;
+  }
+
+  /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
+  Uint8List asUint8List([int offset = 0, int length]) =>
+      buf.buffer.asUint8List(offset, length ?? buf.length);
 
   /// Creates an [Uint16List] copy of the specified region of _this_.
   Uint16List getUint16List([int offset = 0, int length]) {
@@ -259,6 +308,71 @@ mixin BytesGetMixin {
         : getFloat64x2List(offset, length);
   }
 
+  // **** Get Strings and List<String>
+
+  /// Returns a [String] containing an _ASCII_ decoding of the specified
+  /// region of _this_.
+  String getAscii([int offset = 0, int length]) =>
+      _getString(offset, length, _ascii);
+
+  /// Returns a [List<String>] containing an _ASCII_ decoding of the specified
+  /// region of _this_, which is then _split_ using [separator].
+  List<String> getAsciiList(
+          [int offset = 0, int length, String separator = '\\']) =>
+      _split(_getString(offset, length, _ascii), separator);
+
+  /// Returns a [String] containing a _Latin_ decoding of the specified
+  /// region of _this_.
+  String getLatin([int offset = 0, int length]) =>
+      _getString(offset, length, _latin);
+
+  /// Returns a [List<String>] containing an _LATIN_ decoding of the specified
+  /// region of _this_, which is then _split_ using [separator].
+  List<String> getLatinList(
+          [int offset = 0, int length, String separator = '\\']) =>
+      _split(_getString(offset, length, _ascii), separator);
+
+  /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
+  String getUtf8([int offset = 0, int length]) =>
+      _getString(offset, length, _utf8);
+
+  /// Returns a [List<String>] containing an _UTF8_ decoding of the specified
+  /// region of _this_, which is then _split_ using [separator].
+  List<String> getUtf8List(
+          [int offset = 0, int length, String separator = '\\']) =>
+      _split(_getString(offset, length, _utf8), separator);
+
+  /// Returns a [String] containing a decoding of the specified region.
+  /// If [decoder] is not specified, it defaults to _UTF-8_.
+  String getString([int offset = 0, int length, Decoder decoder]) =>
+      _getString(offset, length, decoder ?? _utf8);
+
+  /// Returns a [List<String>]. This is done by first decoding
+  /// the specified region using [decoder], and then _split_ing the
+  /// resulting [String] using the [separator] character.
+  List<String> getStringList(
+          [int offset = 0,
+          int length,
+          Decoder decoder,
+          String separator = '\\']) =>
+      _split(_getString(offset, length, decoder ?? _utf8), separator);
+
+  /// Returns a [String] containing a _Base64_ encoding of the specified
+  /// region of _this_.
+  String getBase64([int offset = 0, int length]) =>
+      cvt.base64.encode(asUint8List(offset, length ?? this.length));
+
+  String _getString(int offset, int length, Decoder decoder) {
+    var list = asUint8List(offset, length ?? buf.length);
+    return list.isEmpty ? '' : decoder(list, allowInvalid: allowInvalid);
+  }
+
+  List<String> _split(String s, [String separator = '\\']) {
+    final x = s.trimLeft();
+    return (x.isEmpty) ? <String>[] : s.split(separator);
+  }
+
+
   // **** Internals
 
   /// Returns the absolute index of [offset] in the underlying [ByteBuffer].
@@ -303,4 +417,14 @@ mixin BytesGetMixin {
   bool _isAligned32(int offset) => _isAligned(offset, 4);
   bool _isAligned64(int offset) => _isAligned(offset, 8);
   bool _isAligned128(int offset) => _isAligned(offset, 16);
+
+// **** local code
+  final _ascii = cvt.ascii.decode;
+  final _latin = cvt.latin1.decode;
+
+// Urgent: remove this when cvt.utf8.decode take a Uint8List argument.
+  String _utf8(List<int> list, {bool allowInvalid}) {
+    final u8List = (list is Uint8List) ? list : Uint8List.fromList(list);
+    return cvt.utf8.decode(u8List, allowMalformed: allowInvalid);
+  }
 }

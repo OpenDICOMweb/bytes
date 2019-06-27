@@ -144,241 +144,9 @@ abstract class Bytes extends ListBase<int>
   Bytes asBytes([int offset = 0, int length]) =>
       Bytes.typedDataView(buf, offset, length ?? buf.length, endian);
 
-  /// Returns an [ByteData] view of the specified region of _this_.
-  ByteData asByteData([int offset = 0, int length]) {
-    length ??= buf.length - offset;
-    return buf.buffer.asByteData(buf.offsetInBytes + offset, length);
-  }
-
-  /// Returns the 8-bit _signed_ integer value
-  /// (between -128 and 127 inclusive) at index [i].
-  int getInt8(int i) => bd.getInt8(i);
-
-  /// Creates an [Int8List] copy of the specified region of _this_.
-  Int8List getInt8List([int offset = 0, int length]) {
-    length ??= buf.length;
-    final list = Int8List(length);
-    for (var i = 0, j = offset; i < length; i++, j++) list[i] = bd.getInt8(j);
-    return list;
-  }
-
-  /// Creates an [Int8List] view of the specified region of _this_.
-  Int8List asInt8List([int offset = 0, int length]) =>
-      buf.buffer.asInt8List(buf.offsetInBytes + offset, length ??= buf.length);
-
-  /// Returns an 8-bit _unsigned_ integer value
-  /// (between 0 and 255 inclusive) at index [i].
-  int getUint8(int i) => buf[i];
-
-  /// Returns a [Uint8List] that is a copy of the specified region of _this_.
-  Uint8List getUint8List([int offset = 0, int length]) {
-    length ??= buf.length;
-    final list = Uint8List(length);
-    for (var i = 0, j = offset; i < length; i++, j++) list[i] = buf[j];
-    return list;
-  }
-
-  /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
-  Uint8List asUint8List([int offset = 0, int length]) =>
-      buf.buffer.asUint8List(offset, length ?? buf.length);
-
-  /// Creates an [Int8List] copy of the specified region of _this_.
-  ByteData getByteData([int offset = 0, int length]) =>
-      getUint8List(offset, length).buffer.asByteData();
-
-  // **** Get Strings and List<String>
-
-  /// Returns a [String] containing an _ASCII_ decoding of the specified
-  /// region of _this_.
-  String getAscii([int offset = 0, int length]) =>
-      _getString(offset, length, _ascii);
-
-  /// Returns a [List<String>] containing an _ASCII_ decoding of the specified
-  /// region of _this_, which is then _split_ using [separator].
-  List<String> getAsciiList(
-          [int offset = 0, int length, String separator = '\\']) =>
-      _split(_getString(offset, length, _ascii), separator);
-
-  /// Returns a [String] containing a _Latin_ decoding of the specified
-  /// region of _this_.
-  String getLatin([int offset = 0, int length]) =>
-      _getString(offset, length, _latin);
-
-  /// Returns a [List<String>] containing an _LATIN_ decoding of the specified
-  /// region of _this_, which is then _split_ using [separator].
-  List<String> getLatinList(
-          [int offset = 0, int length, String separator = '\\']) =>
-      _split(_getString(offset, length, _ascii), separator);
-
-  /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
-  String getUtf8([int offset = 0, int length]) =>
-      _getString(offset, length, _utf8);
-
-  /// Returns a [List<String>] containing an _UTF8_ decoding of the specified
-  /// region of _this_, which is then _split_ using [separator].
-  List<String> getUtf8List(
-          [int offset = 0, int length, String separator = '\\']) =>
-      _split(_getString(offset, length, _utf8), separator);
-
-  /// Returns a [String] containing a decoding of the specified region.
-  /// If [decoder] is not specified, it defaults to _UTF-8_.
-  String getString(
-          [int offset = 0,
-          int length,
-          Decoder decoder]) =>
-      _getString(offset, length, decoder ?? _utf8);
-
-  /// Returns a [List<String>]. This is done by first decoding
-  /// the specified region using [decoder], and then _split_ing the
-  /// resulting [String] using the [separator] character.
-  List<String> getStringList(
-          [int offset = 0,
-          int length,
-          Decoder decoder,
-          String separator = '\\']) =>
-      _split(_getString(offset, length, decoder ?? _utf8), separator);
-
-  /// Returns a [String] containing a _Base64_ encoding of the specified
-  /// region of _this_.
-  String getBase64([int offset = 0, int length]) =>
-      cvt.base64.encode(asUint8List(offset, length ?? this.length));
-
-  String _getString(int offset, int length, Decoder decoder) {
-    var list = asUint8List(offset, length ?? buf.length);
-    return list.isEmpty ? '' : decoder(list, allowInvalid: allowInvalid);
-  }
-
-  List<String> _split(String s, [String separator = '\\']) {
-    final x = s.trimLeft();
-    return (x.isEmpty) ? <String>[] : s.split(separator);
-  }
-
-  // **** Setters that have no Endianness
-
   /// Sets the byte at [offset] in _this_ to [v].
   @override
   void operator []=(int offset, int v) => buf[offset] = v;
-
-  /// Copies [length] bytes from other starting at offset into _this_
-  /// starting at [start]. [length] defaults [bytes].length.
-  void setBytes(int start, Bytes bytes, [int offset = 0, int length]) {
-    length ?? bytes.length;
-    _checkRange(offset, length);
-    final buf1 = bytes.buf;
-    for (var i = start, j = offset; i < length; i++, j++) buf[i] = buf1[j];
-  }
-
-  /// Sets the bytes at [offset] in _this_ to the bytes in [bd] from
-  /// [offset] to [length].
-  int setByteData(int start, ByteData bd, [int offset = 0, int length]) {
-    length ??= bd.lengthInBytes;
-    _checkRange(offset, length);
-    for (var i = start, j = offset; i < length; i++, j++)
-      buf[i] = bd.getUint8(j);
-    return length;
-  }
-
-  /// Sets the byte at [offset] in _this_ to [v].
-  void setInt8(int offset, int v) => buf[offset] = v;
-
-  /// Returns the number of bytes set.
-  int setInt8List(int start, List<int> list, [int offset = 0, int length]) {
-    length ??= list.length;
-    _checkRange(offset, length);
-    for (var i = start, j = offset; i < length; i++, j++) buf[i] = list[j];
-    return length;
-  }
-
-  /// Sets the byte at [offset] in _this_ to [v].
-  void setUint8(int offset, int v) => buf[offset] = v;
-
-  /// Sets the bytes in _this_ from [start] to [start] + [length]
-  /// to the elements in [list] from [offset] to [offset] + [length]
-  int setUint8List(int start, List<int> list, [int offset = 0, int length]) {
-    length ??= list.length;
-    _checkRange(offset, length);
-    for (var i = start, j = offset; i < length; i++, j++) buf[i] = list[j];
-    return length;
-  }
-
-  // **** String Setters
-
-  // TODO: unit test
-  // TODO: what is the use case for having offset and length?
-  /// Ascii encodes the specified range of [s] and then writes the
-  /// code units to _this_ starting at [start].
-  /// Returns the number of bytes written.
-  int setAscii(int start, String s) =>
-      _setStringBytes(start, cvt.ascii.encode(s));
-
-  /// Writes the ASCII [String]s in [sList] to _this_ starting at
-  /// [start]. Returns the number of bytes written.
-  int setAsciiList(int start, List<String> sList, [String separator = '\\']) =>
-      _setLatinList(start, sList, separator, 127);
-
-  // TODO: unit test
-  /// UTF-8 encodes the specified range of [s] and then writes the
-  /// code units to _this_ starting at [start].
-  /// Returns the number of bytes written.
-  int setLatin(int start, String s) =>
-      _setStringBytes(start, cvt.latin1.encode(s));
-
-  /// Writes the LATIN [String]s in [sList] to _this_ starting at
-  /// [start]. Returns the number of bytes written.
-  ///
-  /// _Note_: All latin character sets are encoded as single 8-bit bytes.
-  int setLatinList(int start, List<String> sList, [String separator = '\\']) =>
-      _setLatinList(start, sList, separator, 255);
-
-  /// Copy [String]s from [sList] into _this_ separated by [separator].
-  // Note: this only works for single byte code points, e.g. Ascii, Latin...).
-  int _setLatinList(
-      int start, List<String> sList, String separator, int limit) {
-    final sepChar = separator.codeUnitAt(0);
-    if (sList.isEmpty) return 0;
-    final last = sList.length - 1;
-    var k = start;
-
-    for (var i = 0; i < sList.length; i++) {
-      final s = sList[i];
-      for (var j = 0; j < s.length; j++) {
-        final c = s.codeUnitAt(j);
-        if (c > limit)
-          throw ArgumentError('Character code $c is out of range $limit');
-        setUint8(k++, s.codeUnitAt(j));
-      }
-      if (i != last) setUint8(k++, sepChar);
-    }
-    return k - start;
-  }
-
-  // TODO: unit test
-  /// UTF-8 encodes [s] and then writes the code units to _this_
-  /// starting at [start]. Returns the number of bytes written.
-  int setUtf8(int start, String s) =>
-      _setStringBytes(start, cvt.utf8.encode(s));
-
-  /// Converts the [String]s in [sList] into a [Uint8List].
-  /// Then copies the bytes into _this_ starting at
-  /// [start]. Returns the number of bytes written.
-  int setUtf8List(int start, List<String> sList, [String separator = '\\']) =>
-      setUtf8(start, sList.join(separator));
-
-  /// Moves bytes from [list] to _this_. Returns the number of bytes written.
-  int _setStringBytes(int start, Uint8List list) {
-    final length = list.length;
-    for (var i = 0, j = start; i < length; i++, j++) buf[j] = list[i];
-    return length;
-  }
-
-  // TODO fix to use Latin
-  /// UTF-8 encodes the specified range of [s] and then writes the
-  /// code units to _this_ starting at [start]. Returns the offset
-  /// of the last byte + 1.
-  ///
-  /// Note: Currently only encodes Latin1.
-  void setString(int start, String s, [Encoder encoder]) =>
-      _setStringBytes(start, encoder(s));
 
   // *** Comparable interface
 
@@ -402,14 +170,6 @@ abstract class Bytes extends ListBase<int>
   }
 
   // **** Growable Methods
-
-  /// The length at which _ensureLength_ switches from doubling the
-  /// underlying [Uint8List] _buf_ to incrementing by [largeChunkIncrement].
-  static int doublingLimit = 128 * k1MB;
-
-  /// The incremental increase in the underlying [Uint8List] _buf_ length
-  /// when growing _buf_, once its length is greater than the [doublingLimit].
-  static int largeChunkIncrement = 4 * k1MB;
 
   ///  Returns _false_ if [length], which must be greater than 0, is
   ///  less then or equal to the current [buf] length; otherwise,
@@ -445,13 +205,13 @@ abstract class Bytes extends ListBase<int>
   String toString() =>
       '$runtimeType($endianness): $offset-${offset + length}:$length';
 
-  // **** Internals
+  /// The length at which _ensureLength_ switches from doubling the
+  /// underlying [Uint8List] _buf_ to incrementing by [largeChunkIncrement].
+  static int doublingLimit = 128 * k1MB;
 
-  void _checkRange(int offset, int sizeInBytes) {
-    final length = offset + sizeInBytes;
-    if (length > buf.length)
-      throw RangeError('$length is larger then bytes remaining $buf.length');
-  }
+  /// The incremental increase in the underlying [Uint8List] _buf_ length
+  /// when growing _buf_, once its length is greater than the [doublingLimit].
+  static int largeChunkIncrement = 4 * k1MB;
 
   /// If _true_ [Decoder] will allow invalid characters.
   static bool allowInvalid = true;
@@ -473,20 +233,18 @@ abstract class Bytes extends ListBase<int>
 
   // Urgent: unit test
   /// Returns a [Bytes] containing the ASCII encoding of [s].
-  static BytesLittleEndian fromAscii(String s) =>
-      _stringToBytes(s, cvt.ascii.encode);
+  static Bytes fromAscii(String s) => _stringToBytes(s, cvt.ascii.encode);
 
   /// Returns a [Bytes] containing the ASCII encoding of [list].
-  static BytesLittleEndian fromAsciiList(List<String> list) =>
+  static Bytes fromAsciiList(List<String> list) =>
       _listToBytes(list, cvt.ascii.encode);
 
   // Urgent: unit test
   /// Returns a [Bytes] containing the Utf8 decoding of [s].
-  static BytesLittleEndian fromLatin(String s) =>
-      _stringToBytes(s, cvt.latin1.encode);
+  static Bytes fromLatin(String s) => _stringToBytes(s, cvt.latin1.encode);
 
   /// Returns a [Bytes] containing the ASCII encoding of [list].
-  static BytesLittleEndian fromLatinList(List<String> list) =>
+  static Bytes fromLatinList(List<String> list) =>
       _listToBytes(list, cvt.latin1.encode);
 
   // Urgent: unit test
@@ -495,43 +253,31 @@ abstract class Bytes extends ListBase<int>
       _stringToBytes(s, cvt.utf8.encode);
 
   /// Returns a [Bytes] containing the ASCII encoding of [list].
-  static BytesLittleEndian fromUtf8List(List<String> list) =>
+  static Bytes fromUtf8List(List<String> list) =>
       _listToBytes(list, cvt.utf8.encode);
 
   // Urgent: unit test
   /// Returns a [Bytes] containing the Utf8 decoding of [s].
-  static BytesLittleEndian fromString(String s) => fromUtf8(s);
+  static Bytes fromString(String s) => fromUtf8(s);
 
   /// Returns a [Bytes] containing the ASCII encoding of [list].
-  static BytesLittleEndian fromStringList(List<String> list) =>
-      fromUtf8List(list);
+  static Bytes fromStringList(List<String> list) => fromUtf8List(list);
 
   // Urgent: unit test
   /// Returns a [Bytes] containing the Base64 decoding of [s].
-  static BytesLittleEndian fromBase64(String s) =>
-      _stringToBytes(s, cvt.ascii.encode);
+  static Bytes fromBase64(String s) => _stringToBytes(s, cvt.ascii.encode);
 }
 
 // Urgent: unit test
 /// Returns a [Bytes] containing a decoding of [s].
-BytesLittleEndian _stringToBytes(String s, List<int> decoder(String s)) {
+Bytes _stringToBytes(String s, List<int> decoder(String s)) {
   if (s.isEmpty) return Bytes.kEmptyBytes;
   Uint8List list = decoder(s);
   return Bytes.typedDataView(list);
 }
 
 /// Returns a [Bytes] containing a decoding of [list].
-BytesLittleEndian _listToBytes(List<String> list, Uint8List decoder(String s)) {
+Bytes _listToBytes(List<String> list, Uint8List decoder(String s)) {
   var s = list.join('\\').trimLeft();
   return _stringToBytes(s, decoder);
-}
-
-// **** local code
-final _ascii = cvt.ascii.decode;
-final _latin = cvt.latin1.decode;
-
-// Urgent: remove this when cvt.utf8.decode take a Uint8List argument.
-String _utf8(List<int> list, {bool allowInvalid}) {
-  final u8List = (list is Uint8List) ? list : Uint8List.fromList(list);
-  return cvt.utf8.decode(u8List, allowMalformed: allowInvalid);
 }

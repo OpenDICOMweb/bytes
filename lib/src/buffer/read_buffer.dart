@@ -20,8 +20,6 @@ class ReadBuffer extends BytesBufferBase with ReadBufferMixin {
   int rIndex;
   @override
   int get wIndex => bytes.length;
-  @override
-  set wIndex(int offset) => throw UnsupportedError('wIndex is not settable');
 
   /// Creates a [ReadBuffer] of [length] starting at [offset] in [bytes].
   ReadBuffer(Bytes bytes, [int offset = 0, int length])

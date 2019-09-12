@@ -35,9 +35,6 @@ mixin BytesGetMixin {
   double getFloat64(int offset);
   Float64x2 getFloat64x2(int offset);
 
-  /// If _true_ [Decoder] will allow invalid characters.
-  static bool allowInvalid;
-
   // **** End of Interface
 
   /// Creates an [Int8List] copy of the specified region of _this_.
@@ -364,7 +361,7 @@ mixin BytesGetMixin {
 
   String _getString(int offset, int length, Decoder decoder) {
     var list = asUint8List(offset, length ?? buf.length);
-    return list.isEmpty ? '' : decoder(list, allowInvalid: allowInvalid);
+    return list.isEmpty ? '' : decoder(list, allowInvalid: Bytes.allowInvalid);
   }
 
   List<String> _split(String s, [String separator = '\\']) {

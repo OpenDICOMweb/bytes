@@ -180,15 +180,13 @@ mixin BytesGetMixin {
 
   String getEndian(Endian endian) => endian == Endian.little ? 'LE' : 'BE';
 
-  final _host = Endian.host;
-
   /// If [offset] is aligned on an 8-byte boundary, returns a [Int16List]
   /// view of the specified region; otherwise, creates a [Int16List] that
   /// is a copy of the specified region and returns it.
   Int16List asInt16List([int offset = 0, int length]) {
     final index = _absIndex(offset);
     length ??= _length16(offset);
-    return (_isAligned16(index) && endian == _host)
+    return (_isAligned16(index) && endian == Endian.host)
         ? buf.buffer.asInt16List(index, length)
         : getInt16List(offset, length);
   }
@@ -199,7 +197,7 @@ mixin BytesGetMixin {
   Int32List asInt32List([int offset = 0, int length]) {
     final index = _absIndex(offset);
     length ??= _length32(offset);
-    return (_isAligned32(index) && endian == _host)
+    return (_isAligned32(index) && endian == Endian.host)
         ? buf.buffer.asInt32List(index, length)
         : getInt32List(offset, length);
   }
@@ -210,7 +208,7 @@ mixin BytesGetMixin {
   Int32x4List asInt32x4List([int offset = 0, int length]) {
     final index = _absIndex(offset);
     length ??= _length128(offset);
-    return (_isAligned128(index) && endian == _host)
+    return (_isAligned128(index) && endian == Endian.host)
         ? buf.buffer.asInt32x4List(index, length)
         : getInt32x4List(offset, length);
   }
@@ -221,7 +219,7 @@ mixin BytesGetMixin {
   Int64List asInt64List([int offset = 0, int length]) {
     final index = _absIndex(offset);
     length ??= _length64(offset);
-    return (_isAligned64(index) && endian == _host)
+    return (_isAligned64(index) && endian == Endian.host)
         ? buf.buffer.asInt64List(index, length)
         : getInt64List(offset, length);
   }
@@ -232,7 +230,7 @@ mixin BytesGetMixin {
   Uint16List asUint16List([int offset = 0, int length]) {
     length ??= _length16(offset);
     final index = _absIndex(offset);
-    return (_isAligned16(index) && endian == _host)
+    return (_isAligned16(index) && endian == Endian.host)
         ? buf.buffer.asUint16List(index, length)
         : getUint16List(offset, length);
   }
@@ -244,7 +242,7 @@ mixin BytesGetMixin {
     length ??= _length32(offset);
     if (length < 0) return null;
     final index = _absIndex(offset);
-    return (_isAligned32(index) && endian == _host)
+    return (_isAligned32(index) && endian == Endian.host)
         ? buf.buffer.asUint32List(index, length)
         : getUint32List(offset, length);
   }
@@ -255,7 +253,7 @@ mixin BytesGetMixin {
   Uint64List asUint64List([int offset = 0, int length]) {
     length ??= _length64(offset);
     final index = _absIndex(offset);
-    return (_isAligned64(index) && endian == _host)
+    return (_isAligned64(index) && endian == Endian.host)
         ? buf.buffer.asUint64List(index, length)
         : getUint64List(offset, length);
   }
@@ -266,7 +264,7 @@ mixin BytesGetMixin {
   Float32List asFloat32List([int offset = 0, int length]) {
     length ??= _length32(offset);
     final index = _absIndex(offset);
-    return (_isAligned32(index) && endian == _host)
+    return (_isAligned32(index) && endian == Endian.host)
         ? buf.buffer.asFloat32List(index, length)
         : getFloat32List(offset, length);
   }
@@ -278,7 +276,7 @@ mixin BytesGetMixin {
   Float32x4List asFloat32x4List([int offset = 0, int length]) {
     length ??= _length128(offset);
     final index = _absIndex(offset);
-    return (_isAligned128(index) && endian == _host)
+    return (_isAligned128(index) && endian == Endian.host)
         ? buf.buffer.asFloat32x4List(index, length)
         : getFloat32x4List(offset, length);
   }
@@ -289,7 +287,7 @@ mixin BytesGetMixin {
   Float64List asFloat64List([int offset = 0, int length]) {
     length ??= _length64(offset);
     final index = _absIndex(offset);
-    return (_isAligned64(index) && endian == _host)
+    return (_isAligned64(index) && endian == Endian.host)
         ? buf.buffer.asFloat64List(index, length)
         : getFloat64List(offset, length);
   }
@@ -300,7 +298,7 @@ mixin BytesGetMixin {
   Float64x2List asFloat64x2List([int offset = 0, int length]) {
     final index = _absIndex(offset);
     length ??= _length128(offset);
-    return (_isAligned128(index) && endian == _host)
+    return (_isAligned128(index) && endian == Endian.host)
         ? buf.buffer.asFloat64x2List(index, length)
         : getFloat64x2List(offset, length);
   }
@@ -310,24 +308,24 @@ mixin BytesGetMixin {
   /// Returns a [String] containing an _ASCII_ decoding of the specified
   /// region of _this_.
   String getAscii([int offset = 0, int length]) =>
-      _getString(offset, length, _ascii);
+      _getString(offset, length, cvt.ascii.decode);
 
   /// Returns a [List<String>] containing an _ASCII_ decoding of the specified
   /// region of _this_, which is then _split_ using [separator].
   List<String> getAsciiList(
           [int offset = 0, int length, String separator = '\\']) =>
-      _split(_getString(offset, length, _ascii), separator);
+      _split(_getString(offset, length, cvt.ascii.decode), separator);
 
   /// Returns a [String] containing a _Latin_ decoding of the specified
   /// region of _this_.
   String getLatin([int offset = 0, int length]) =>
-      _getString(offset, length, _latin);
+      _getString(offset, length, cvt.latin1.decode);
 
   /// Returns a [List<String>] containing an _LATIN_ decoding of the specified
   /// region of _this_, which is then _split_ using [separator].
   List<String> getLatinList(
           [int offset = 0, int length, String separator = '\\']) =>
-      _split(_getString(offset, length, _ascii), separator);
+      _split(_getString(offset, length, cvt.ascii.decode), separator);
 
   /// Returns a [String] containing a _UTF-8_ decoding of the specified region.
   String getUtf8([int offset = 0, int length]) =>
@@ -414,10 +412,6 @@ mixin BytesGetMixin {
   bool _isAligned32(int offset) => _isAligned(offset, 4);
   bool _isAligned64(int offset) => _isAligned(offset, 8);
   bool _isAligned128(int offset) => _isAligned(offset, 16);
-
-// **** local code
-  final _ascii = cvt.ascii.decode;
-  final _latin = cvt.latin1.decode;
 
 // Urgent: remove this when cvt.utf8.decode take a Uint8List argument.
   String _utf8(List<int> list, {bool allowInvalid}) {

@@ -97,10 +97,16 @@ abstract class Bytes extends ListBase<int>
     return hashCode;
   }
 
+  // TODO: test performance of caching _bd vs doing conversion
+/*
   ByteData _bd;
 
   @override
   ByteData get bd => _bd ??= buf.buffer.asByteData(buf.offsetInBytes);
+*/
+
+  @override
+  ByteData get bd => buf.buffer.asByteData(buf.offsetInBytes);
 
   // **** TypedData interface.
 
@@ -197,7 +203,8 @@ abstract class Bytes extends ListBase<int>
     final newBuf = Uint8List(len);
     for (var i = 0; i < buf.lengthInBytes; i++) newBuf[i] = buf[i];
     buf = newBuf;
-    _bd = buf.buffer.asByteData();
+    // TODO: Remove or keep after testing bd caching
+    //    _bd = buf.buffer.asByteData();
     return true;
   }
 

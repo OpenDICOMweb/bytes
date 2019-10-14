@@ -339,7 +339,10 @@ mixin BytesGetMixin {
 
   /// Returns a [String] containing a decoding of the specified region.
   /// If [decoder] is not specified, it defaults to _UTF-8_.
-  String getString([int offset = 0, int length, Decoder decoder]) =>
+  String getString(
+          [int offset = 0,
+          int length,
+          String decoder(Uint8List list, {bool allowInvalid})]) =>
       _getString(offset, length, decoder ?? _utf8);
 
   /// Returns a [List<String>]. This is done by first decoding
@@ -348,7 +351,7 @@ mixin BytesGetMixin {
   List<String> getStringList(
           [int offset = 0,
           int length,
-          Decoder decoder,
+          String decoder(Uint8List list, {bool allowInvalid}),
           String separator = '\\']) =>
       _split(_getString(offset, length, decoder ?? _utf8), separator);
 
@@ -357,7 +360,8 @@ mixin BytesGetMixin {
   String getBase64([int offset = 0, int length]) =>
       cvt.base64.encode(asUint8List(offset, length ?? this.length));
 
-  String _getString(int offset, int length, Decoder decoder) {
+  String _getString(int offset, int length,
+      String decoder(Uint8List list, {bool allowInvalid})) {
     var list = asUint8List(offset, length ?? buf.length);
     return list.isEmpty ? '' : decoder(list, allowInvalid: Bytes.allowInvalid);
   }
@@ -366,7 +370,6 @@ mixin BytesGetMixin {
     final x = s.trimLeft();
     return (x.isEmpty) ? <String>[] : s.split(separator);
   }
-
 
   // **** Internals
 

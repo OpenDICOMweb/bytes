@@ -15,9 +15,6 @@ import 'package:bytes/src/bytes/bytes_get_mixin.dart';
 import 'package:bytes/src/bytes/bytes_set_mixin.dart';
 import 'package:bytes/src/constants.dart';
 
-typedef Decoder = String Function(Uint8List list, {bool allowInvalid});
-typedef Encoder = Uint8List Function(String s);
-
 /// Bytes Package Overview
 ///
 /// - All get_XXX_List methods return fixed length (unmodifiable) Lists.
@@ -220,7 +217,7 @@ abstract class Bytes extends ListBase<int>
   /// when growing _buf_, once its length is greater than the [doublingLimit].
   static int largeChunkIncrement = 4 * k1MB;
 
-  /// If _true_ [Decoder] will allow invalid characters.
+  /// If _true_ the Decoder will allow invalid characters.
   static bool allowInvalid = true;
 
   /// The maximum length of _this_.

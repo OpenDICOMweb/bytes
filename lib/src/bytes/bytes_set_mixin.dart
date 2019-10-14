@@ -12,6 +12,8 @@ import 'dart:typed_data';
 import 'package:bytes/bytes.dart';
 import 'package:bytes/src/constants.dart';
 
+
+
 /// [BytesSetMixin] is a class that provides a read-only byte array that
 /// supports both [Uint8List] and [ByteData] interfaces.
 mixin BytesSetMixin implements EndianSetters {
@@ -38,7 +40,6 @@ mixin BytesSetMixin implements EndianSetters {
       buf[i] = bd.getUint8(j);
     return length;
   }
-
 
   // **** Int set methods
 
@@ -68,7 +69,6 @@ mixin BytesSetMixin implements EndianSetters {
       setInt32(j, list[i]);
     return length * 4;
   }
-
 
   /// Creates an [Int32x4List] copy of the specified region of _this_.
   int setInt32x4List(int start, List<Int32x4> list,
@@ -238,9 +238,8 @@ mixin BytesSetMixin implements EndianSetters {
   /// of the last byte + 1.
   ///
   /// Note: Currently only encodes Latin1.
-  void setString(int start, String s, [Encoder encoder]) =>
+  void setString(int start, String s, [Uint8List encoder(String s)]) =>
       _setStringBytes(start, encoder(s));
-
 
   // **** Internals
 

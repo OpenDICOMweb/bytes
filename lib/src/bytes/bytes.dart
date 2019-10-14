@@ -254,7 +254,7 @@ abstract class Bytes extends ListBase<int>
   // Urgent: unit test
   /// Returns a [Bytes] containing the Utf8 decoding of [s].
   static BytesLittleEndian fromUtf8(String s) =>
-      _stringToBytes(s, cvt.utf8.encode);
+    _stringToBytes(s, cvt.utf8.encode);
 
   /// Returns a [Bytes] containing the ASCII encoding of [list].
   static Bytes fromUtf8List(List<String> list) =>
@@ -272,11 +272,11 @@ abstract class Bytes extends ListBase<int>
   static Bytes fromBase64(String s) => _stringToBytes(s, cvt.ascii.encode);
 }
 
-// Urgent: unit test
+// Urgent: fix List<int> to Uint8Lists
 /// Returns a [Bytes] containing a decoding of [s].
-Bytes _stringToBytes(String s, Uint8List encoder(String s)) {
+Bytes _stringToBytes(String s, List<int> encoder(String s)) {
   if (s.isEmpty) return Bytes.kEmptyBytes;
-  final list = encoder(s);
+  final Uint8List list = encoder(s);
   return Bytes.typedDataView(list);
 }
 

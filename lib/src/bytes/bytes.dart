@@ -274,14 +274,14 @@ abstract class Bytes extends ListBase<int>
 
 // Urgent: unit test
 /// Returns a [Bytes] containing a decoding of [s].
-Bytes _stringToBytes(String s, List<int> decoder(String s)) {
+Bytes _stringToBytes(String s, Uint8List encoder(String s)) {
   if (s.isEmpty) return Bytes.kEmptyBytes;
-  Uint8List list = decoder(s);
+  final list = encoder(s);
   return Bytes.typedDataView(list);
 }
 
 /// Returns a [Bytes] containing a decoding of [list].
-Bytes _listToBytes(List<String> list, Uint8List decoder(String s)) {
+Bytes _listToBytes(List<String> list, Uint8List encoder(String s)) {
   var s = list.join('\\').trimLeft();
-  return _stringToBytes(s, decoder);
+  return _stringToBytes(s, encoder);
 }

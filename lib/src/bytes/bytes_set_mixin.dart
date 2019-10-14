@@ -96,7 +96,7 @@ mixin BytesSetMixin implements EndianSetters {
   int setUint8List(int start, List<int> list, [int offset = 0, int length]) {
     length ??= list.length;
     _checkRange(offset, length);
-    for (var i = start, j = offset; i < length; i++, j++) buf[i] = list[j];
+    for (var i = start, j = offset; j < length; i++, j++) buf[i] = list[j];
     return length;
   }
 

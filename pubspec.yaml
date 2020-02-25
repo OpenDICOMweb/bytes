@@ -9,8 +9,8 @@ environment:
   sdk: '>=2.0.0 <3.0.0'
 
 dependencies:
-  base:
-    path: C:/odw/sdk/base
+  constants:
+    path: C:/odw/constants
     version: ^0.7.6
 
 dev_dependencies:

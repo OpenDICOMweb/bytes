@@ -10,6 +10,6 @@ export 'package:bytes/src/bytes/bytes_endian_get_mixins.dart';
 export 'package:bytes/src/bytes/bytes_endian_set_mixins.dart';
 export 'package:bytes/src/bytes/bytes_get_mixin.dart';
 export 'package:bytes/src/bytes/bytes_set_mixin.dart';
-export 'package:bytes/src/constants.dart';
+export 'package:bytes/src/constants.dart.old';
 
 

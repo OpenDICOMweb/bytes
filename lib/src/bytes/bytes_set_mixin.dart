@@ -10,7 +10,7 @@ import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
 import 'package:bytes/bytes.dart';
-import 'package:bytes/src/constants.dart';
+import 'package:bytes/src/constants.dart.old';
 
 
 

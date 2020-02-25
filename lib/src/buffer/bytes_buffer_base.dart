@@ -9,7 +9,6 @@ import 'dart:typed_data';
 
 import 'package:bytes/bytes.dart';
 
-
 /// The base class for BytesBuffer]s.
 abstract class BytesBufferBase {
   /// The underlying [Bytes] for the buffer.

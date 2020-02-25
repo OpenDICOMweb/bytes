@@ -7,7 +7,7 @@
 //  See the AUTHORS file for other contributors.
 //
 import 'package:bytes/bytes.dart';
-import 'package:bytes/src/constants.dart';
+import 'package:bytes/src/constants.dart.old';
 import 'package:test/test.dart';
 
 void main() {

@@ -13,7 +13,7 @@ import 'dart:typed_data';
 import 'package:bytes/src/bytes/bytes_endian.dart';
 import 'package:bytes/src/bytes/bytes_get_mixin.dart';
 import 'package:bytes/src/bytes/bytes_set_mixin.dart';
-import 'package:bytes/src/constants.dart';
+import 'package:bytes/src/constants.dart.old';
 
 /// Bytes Package Overview
 ///

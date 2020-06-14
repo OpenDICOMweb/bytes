@@ -1,6 +1,6 @@
 name: bytes
 description: A package that unifies Uint8List and ByteData.
-version: 0.7.6
+version: 0.8.0
 author: Jim Philbin <jfphilbin@gmail.com>
 
 homepage: https://github.com/OpenDICOMweb/bytes
@@ -11,7 +11,7 @@ environment:
 dependencies:
   constants:
     path: C:/odw/constants
-    version: ^0.7.6
+    version: ^0.8.0
 
 dev_dependencies:
   benchmark_harness: any
@@ -20,7 +20,7 @@ dev_dependencies:
   test:  any
   test_tools:
     path: C:/odw/test_tools
-    version: ^0.7.5
+    version: ^0.8.0
   rng:
-    path: C:/odw/sdk/rng
+    path: C:/odw/rng
     version: ^0.8.0

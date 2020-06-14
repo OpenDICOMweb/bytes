@@ -96,15 +96,14 @@ void main() {
 
         for (var i = 0; i < vList0.length + 1; i++) {
           // log.debug('i: $i length ${vList0.length - i}');
-          final Uint32List vList1 = vList0.sublist(i, vList0.length);
+          final vList1 = vList0.sublist(i, vList0.length);
           expect(vList1.buffer != vList0.buffer, true);
           // log.debug('vList1: $vList1');
-          final Uint32List vList2 = vList0.sublist(0, vList0.length - i);
+          final vList2 = vList0.sublist(0, vList0.length - i);
           expect(vList2.buffer != vList0.buffer, true);
           // log.debug('vList2: $vList2');
 
           final j = i * 4;
-       // log.debug('j: $j mid ${bytes0.length - j} length ${bytes0.length}');
 
           final vList3 = bytes0.asUint32List(j, vList0.length - i);
           // log.debug('vList3: $vList3');
@@ -136,15 +135,14 @@ void main() {
 
         for (var i = 0; i < vList0.length + 1; i++) {
           // log.debug('i: $i length ${vList0.length - i}');
-          final Uint32List vList1 = vList0.sublist(i, vList0.length);
+          final vList1 = vList0.sublist(i, vList0.length);
           expect(vList1.buffer != vList0.buffer, true);
           // log.debug('vList1: $vList1');
-          final Uint32List vList2 = vList0.sublist(0, vList0.length - i);
+          final vList2 = vList0.sublist(0, vList0.length - i);
           expect(vList2.buffer != vList0.buffer, true);
           // log.debug('vList2: $vList2');
 
           final j = i * 4;
-       // log.debug('j: $j mid ${bytes0.length - j} length ${bytes0.length}');
           final bytes1 = bytes0.sublist(j, bytes0.length);
           expect(bytes1.buffer != vList0.buffer, true);
 
@@ -199,7 +197,6 @@ void main() {
           // log.debug('vList2: $vList2');
           expect(vList2.buffer == vList0.buffer, true);
 
-       // log.debug('j: $j mid ${bytes0.length - j} length ${bytes0.length}');
           final bytes1 = bytes0.asBytes(j, bytes0.length - j);
           expect(bytes1.buffer == vList0.buffer, true);
           expect(bytes1.buffer == bytes0.buffer, true);

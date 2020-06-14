@@ -29,8 +29,7 @@ void main() {
       // log.debug('vList3: $vList3');
       expect(vList3, equals(vList0));
       expect(vList3, equals(vList2));
-      final bytes4 = Bytes(bytes0.length)
-        ..setInt64List(0, vList0);
+      final bytes4 = Bytes(bytes0.length)..setInt64List(0, vList0);
       final vList4 = bytes4.asInt64List();
       expect(vList4, equals(vList3));
     });
@@ -96,15 +95,14 @@ void main() {
 
         for (var i = 0; i < vList0.length + 1; i++) {
           // log.debug('i: $i length ${vList0.length - i}');
-          final Int64List vList1 = vList0.sublist(i, vList0.length);
+          final vList1 = vList0.sublist(i, vList0.length);
           expect(vList1.buffer != vList0.buffer, true);
           // log.debug('vList1: $vList1');
-          final Int64List vList2 = vList0.sublist(0, vList0.length - i);
+          final vList2 = vList0.sublist(0, vList0.length - i);
           expect(vList2.buffer != vList0.buffer, true);
           // log.debug('vList2: $vList2');
 
           final j = i * 8;
-       // log.debug('j: $j mid ${bytes0.length - j} length ${bytes0.length}');
 
           final vList3 = bytes0.asInt64List(j, vList0.length - i);
           // log.debug('vList3: $vList3');
@@ -136,15 +134,14 @@ void main() {
 
         for (var i = 0; i < vList0.length + 1; i++) {
           // log.debug('i: $i length ${vList0.length - i}');
-          final Int64List vList1 = vList0.sublist(i, vList0.length);
+          final vList1 = vList0.sublist(i, vList0.length);
           expect(vList1.buffer != vList0.buffer, true);
           // log.debug('vList1: $vList1');
-          final Int64List vList2 = vList0.sublist(0, vList0.length - i);
+          final vList2 = vList0.sublist(0, vList0.length - i);
           expect(vList2.buffer != vList0.buffer, true);
           // log.debug('vList2: $vList2');
 
           final j = i * 8;
-       // log.debug('j: $j mid ${bytes0.length - j} length ${bytes0.length}');
           final bytes1 = bytes0.sublist(j, bytes0.length);
           expect(bytes1.buffer != vList0.buffer, true);
 
@@ -200,7 +197,6 @@ void main() {
           // log.debug('vList2: $vList2');
           expect(vList2.buffer == vList0.buffer, true);
 
-       // log.debug('j: $j mid ${bytes0.length - j} length ${bytes0.length}');
           final bytes1 = bytes0.asBytes(j, bytes0.length - j);
           // log.debug('bytes1: $bytes1');
           expect(bytes1.buffer == vList0.buffer, true);

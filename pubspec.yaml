@@ -17,7 +17,7 @@ dev_dependencies:
   test:  any
   test_tools:
     path: C:/odw/test_tools
-    version: ^0.7.5
+    version: ^0.8.0
   rng:
-    path: C:/odw/sdk/rng
+    path: C:/odw/rng
     version: ^0.8.0
